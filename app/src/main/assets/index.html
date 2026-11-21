@@ -420,6 +420,7 @@
     <div class="setrow">👆 Kaydırma kontrolü <small style="opacity:.5;font-weight:400">yukarı=dış</small> <button class="tgl" data-k="swipe"></button></div>
     <div class="setrow">🫲 Solak mod <small style="opacity:.5;font-weight:400">sol=dış</small> <button class="tgl" data-k="lefty"></button></div>
     <div class="setrow">✨ Ekran sarsıntısı <button class="tgl" data-k="shake"></button></div>
+    <div class="setrow">👻 Rekor kopyasını göster <small style="opacity:.5;font-weight:400">hayalet top</small> <button class="tgl" data-k="ghostRun"></button></div>
     <div class="setrow">💡 İpuçlarını tekrar göster <button class="ghost" id="tutReset" style="padding:6px 14px">Sıfırla</button></div>
   </div>
   <div class="row">
@@ -853,7 +854,7 @@
   }
 
   // ================= SETTINGS =================
-  let settings = Object.assign({ music: true, sfx: true, vib: true, shake: true, swipe: false, lefty: false }, store.get('settings', {}));
+  let settings = Object.assign({ music: true, sfx: true, vib: true, shake: true, swipe: false, lefty: false, ghostRun: true }, store.get('settings', {}));
 
   // ================= AUDIO =================
   let actx = null, master = null, sfxG = null, musG = null, noiseBuf = null;
@@ -2704,7 +2705,7 @@
       }
 
       // hayalet rekor (tek kişilik)
-      if (mode === 'solo' && state === 'play' && ghostRun && ghostRun.length > 1) {
+      if (settings.ghostRun && mode === 'solo' && state === 'play' && ghostRun && ghostRun.length > 1) {
         const fi = gt / 0.1, i0 = Math.floor(fi);
         if (i0 < ghostRun.length - 1) {
           const g0 = ghostRun[i0], g1 = ghostRun[i0 + 1], f = fi - i0;
