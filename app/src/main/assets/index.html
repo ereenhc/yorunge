@@ -158,7 +158,9 @@
   /* settings */
   .setlist{display:flex;flex-direction:column;gap:10px;width:min(380px,90vw)}
   .setrow{display:flex;align-items:center;justify-content:space-between;background:rgba(20,22,45,.75);border:1px solid #2e3360;border-radius:14px;padding:12px 16px;font-weight:600}
-  .tgl{width:52px;height:30px;border-radius:999px;background:#2e3360;border:0;position:relative;cursor:pointer;transition:background .2s}
+  /* açıklama yazısı ortada boşta durmasın: başlığın hemen yanında, düğme her zaman sağda */
+  .setrow small{margin:0 auto 0 8px;font-size:12px;white-space:nowrap}
+  .tgl{width:52px;height:30px;border-radius:999px;background:#2e3360;border:0;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;margin-left:10px}
   .tgl::after{content:'';position:absolute;top:4px;left:4px;width:22px;height:22px;border-radius:50%;background:#e8ecff;transition:left .2s}
   .tgl.on{background:#5cff9d}
   .tgl.on::after{left:26px}
@@ -420,6 +422,7 @@
     <div class="setrow">👆 Kaydırma kontrolü <small style="opacity:.5;font-weight:400">yukarı=dış</small> <button class="tgl" data-k="swipe"></button></div>
     <div class="setrow">🫲 Solak mod <small style="opacity:.5;font-weight:400">sol=dış</small> <button class="tgl" data-k="lefty"></button></div>
     <div class="setrow">✨ Ekran sarsıntısı <button class="tgl" data-k="shake"></button></div>
+    <div class="setrow">🔔 Bildirimler <small style="opacity:.5;font-weight:400">günlük hatırlatma</small> <button class="tgl" data-k="notif"></button></div>
     <div class="setrow">👻 Rekor kopyasını göster <small style="opacity:.5;font-weight:400">hayalet top</small> <button class="tgl" data-k="ghostRun"></button></div>
     <div class="setrow">💡 İpuçlarını tekrar göster <button class="ghost" id="tutReset" style="padding:6px 14px">Sıfırla</button></div>
   </div>
@@ -864,7 +867,10 @@
   }
 
   // ================= SETTINGS =================
-  let settings = Object.assign({ music: true, sfx: true, vib: true, shake: true, swipe: false, lefty: false, ghostRun: true }, store.get('settings', {}));
+  let settings = Object.assign({ music: true, sfx: true, vib: true, shake: true, swipe: false, lefty: false, ghostRun: true, notif: true }, store.get('settings', {}));
+  // bildirim ayarının asıl kaynağı Android tarafı (alarm orada kuruluyor)
+  const AB = window.YorungeAndroid;
+  try { if (AB && AB.notifEnabled) settings.notif = !!AB.notifEnabled(); } catch (e) {}
 
   // ================= AUDIO =================
   let actx = null, master = null, sfxG = null, musG = null, noiseBuf = null;
@@ -2888,6 +2894,14 @@
     const WR = wkRule(), wd = wkData();
     $('wkEm').textContent = WR.em;
     $('wkInfo').textContent = `${WR.name}: ${WR.ds} · ` + (wd.done ? '✓ ödül alındı' : `${WR.target} puan → +${WK_REWARD} ✦`);
+    // bildirimlerin duruma göre mesaj seçebilmesi için oyun durumunu Android'e aktar
+    if (AB && AB.syncNotif) {
+      const cheap = SKINS.filter(s => !s.chest && !(owned || []).includes(s.id)).sort((a, b) => a.price - b.price)[0];
+      const streak = (dr.last === dayIdx() || dr.last === dayIdx() - 1) ? dr.streak : 0;
+      try {
+        AB.syncNotif(JSON.stringify({ streak, best, missions: claimable(), coins, shopName: cheap ? cheap.name : '', shopPrice: cheap ? cheap.price : 0, wkName: WR.name, wkEm: WR.em, wkDone: wd.done }));
+      } catch (e) {}
+    }
   }
   function renderSettings() {
     document.querySelectorAll('.tgl').forEach(b => b.classList.toggle('on', !!settings[b.dataset.k]));
@@ -3319,6 +3333,7 @@
     const k = b.dataset.k; settings[k] = !settings[k]; store.set('settings', settings);
     renderSettings(); applyAudio();
     if (k === 'vib' && settings.vib) buzz(40);
+    if (k === 'notif') { try { if (AB && AB.setNotifEnabled) AB.setNotifEnabled(!!settings.notif); } catch (e2) {} }
   }));
   on('turnsBtn', () => openSub('turnsSetup', 'menu'));
   on('turnsGo', () => startTurns());

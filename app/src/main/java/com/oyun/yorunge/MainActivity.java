@@ -1,8 +1,10 @@
 package com.oyun.yorunge;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -79,10 +81,42 @@ public class MainActivity extends Activity {
         hideSystemUi();
 
         webView.loadUrl("file:///android_asset/index.html");
+
+        // Günlük hatırlatma: açılışı kaydet, 19:00 alarmını kur, ilk açılışta bildirim iznini bir kez sor
+        NotifReceiver.markOpened(this);
+        NotifReceiver.schedule(this);
+        if (NotifReceiver.isEnabled(this) && !NotifReceiver.prefs(this).getBoolean("asked", false)) {
+            NotifReceiver.prefs(this).edit().putBoolean("asked", true).apply();
+            requestNotifPermission();
+        }
+    }
+
+    private void requestNotifPermission() {
+        if (Build.VERSION.SDK_INT >= 33
+                && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 42);
+        }
     }
 
     /** Oyundan gelen PNG'yi (base64) önbelleğe yazıp Android paylaşım menüsünü açar. */
     private class ShareBridge {
+        /** Bildirimlerde kullanılacak oyun durumu (seri, rekor, görevler, mağaza, haftalık). */
+        @JavascriptInterface
+        public void syncNotif(String json) {
+            NotifReceiver.saveState(MainActivity.this, json);
+        }
+
+        @JavascriptInterface
+        public boolean notifEnabled() {
+            return NotifReceiver.isEnabled(MainActivity.this);
+        }
+
+        @JavascriptInterface
+        public void setNotifEnabled(boolean on) {
+            NotifReceiver.setEnabled(MainActivity.this, on);
+            if (on) runOnUiThread(MainActivity.this::requestNotifPermission);
+        }
+
         @JavascriptInterface
         public void shareImage(final String base64Png, final String text) {
             runOnUiThread(() -> {
@@ -173,6 +207,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        NotifReceiver.markOpened(this);
         if (webView != null) webView.onResume();
     }
 
