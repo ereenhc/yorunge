@@ -1,0 +1,52 @@
+plugins {
+    id 'com.android.application'
+}
+
+// Yayın (Play Store) imza bilgileri proje kökündeki keystore.properties dosyasından okunur.
+// Bu dosya ve .jks anahtarı ÇOK ÖNEMLİ: kaybedersen uygulamayı güncelleyemezsin, yedekle!
+def keystorePropsFile = rootProject.file("keystore.properties")
+def keystoreProps = new Properties()
+if (keystorePropsFile.exists()) {
+    keystorePropsFile.withInputStream { keystoreProps.load(it) }
+}
+
+android {
+    namespace 'com.oyun.yorunge'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.oyun.yorunge"
+        minSdk 24
+        targetSdk 35
+        versionCode 9
+        versionName "1.8"
+    }
+
+    signingConfigs {
+        release {
+            if (keystorePropsFile.exists()) {
+                storeFile rootProject.file(keystoreProps['storeFile'])
+                storePassword keystoreProps['storePassword']
+                keyAlias keystoreProps['keyAlias']
+                keyPassword keystoreProps['keyPassword']
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            // keystore.properties varsa kendi yayın anahtarınla, yoksa debug anahtarıyla imzalar.
+            signingConfig keystorePropsFile.exists() ? signingConfigs.release : signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation "androidx.core:core:1.13.1"
+}

@@ -1,0 +1,14 @@
+.gradle/
+build/
+local.properties
+.idea/
+*.iml
+.DS_Store
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Yayın imza anahtarı ve şifreleri ASLA git'e gitmemeli
+keystore.properties
+*.jks
+*.keystore
