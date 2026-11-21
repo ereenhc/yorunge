@@ -352,7 +352,7 @@
   <p style="font-size:14px"><b style="color:#ff5cf0">Boss:</b> Her 5 seviyede güneş kararır ve <b>Kara Güneş</b> olur. Sana ateş eder; topladığın her yıldız ona ışın gönderir (altın yıldız 3 hasar). Yenince +20 puan!</p>
   <p style="font-size:14px"><b>Modlar:</b> 📅 Günün Meydan Okumasında o gün herkese aynı göktaşı ve yıldız sırası gelir, skorunu arkadaşlarınla karşılaştır. 👥 2 Kişide ekranın sol yarısı 1. oyuncunun, sağ yarısı 2. oyuncunun: üst kısma dokun = dışa, alt kısma = içe. 🔁 Sırayla modunda herkes aynı parkurda bir el oynar.</p>
   <p style="font-size:14px">⏱️ Zamana Karşı: 60 saniye, çarpınca ölmezsin ama −5 puan. 💀 Hardcore: her şey %35 hızlı ama puanlar 2 katı. 🧘 Zen: hiç düşman yok, rahatla (✦ kazandırmaz).</p>
-  <p style="font-size:14px"><b style="color:#9be7ff">Yeni:</b> ☄️ Kuyruklu yıldız (Sv. 4+) kırmızı çizgiyle uyarır · 🪨 Asteroit kuşağı (Sv. 5+) halkanın bir kısmını kapatır · 🪐 Sv. 10'da 4. halka açılır · D Zaman Dondur gücü · göktaşını sıyırırsan <b>Kıl Payı +2</b> · her x10 komboda <b>Çılgınlık</b> (2x puan) · rekor koşun 👻 hayalet olarak seninle uçar.</p>
+  <p style="font-size:14px"><b style="color:#9be7ff">Yeni:</b> ☄️ Kuyruklu yıldız (Sv. 4+) kırmızı çizgiyle uyarır · 🪨 Asteroit kuşağı (Sv. 5+) halkanın bir kısmını kapatır · 🪐 Sv. 10'da 4. halka açılır · D Zaman Dondur gücü · göktaşını sıyırırsan <b>Kıl Payı +2</b> · her x10 komboda <b>Çılgınlık</b> (2x puan) · rekor koşun 👻 hayalet olarak seninle uçar · 💣 Yörünge mayını (Sv. 6+) birkaç saniye sonra patlar, yakınından uzaklaş · ✨ Takımyıldız: çizgiyle bağlı 5 yıldızın hepsini toplarsan +10 · <b style="color:#c6ff5c">mi</b> Mini gücü: 6 sn küçülürsün.</p>
   <p class="small">Adil olsun diye meydan okuma, 2 kişi ve sırayla modlarında mağaza yükseltmeleri kapalıdır (yıldız görünümleri açık).</p>
   <button class="ghost back">← Geri</button>
 </div>
@@ -1008,7 +1008,8 @@
     { id: 'near10', ic: '😅', name: 'Sıyırma Ustası', ds: 'Bir oyunda 10 kıl payı yap', rw: 60 },
     { id: 'fever', ic: '🌈', name: 'Çılgınlık!', ds: 'Çılgınlık moduna gir', rw: 40 },
     { id: 'ring4', ic: '🪐', name: 'Dördüncü Yörünge', ds: '4. halkayı aç', rw: 80 },
-    { id: 'weekly', ic: '📆', name: 'Haftanın Yıldızı', ds: 'Haftalık meydan okumayı tamamla', rw: 100 }
+    { id: 'weekly', ic: '📆', name: 'Haftanın Yıldızı', ds: 'Haftalık meydan okumayı tamamla', rw: 100 },
+    { id: 'cons', ic: '✨', name: 'Yıldız Haritası', ds: 'Bir takımyıldızı tamamla', rw: 50 }
   ];
   let achieved = store.get('ach', {});
   function unlock(id) {
@@ -1059,6 +1060,8 @@
   let hardBest = store.get('hardBest', 0);
   // yeni: dondurma gücü, asteroit kuşağı, kuyruklu yıldız, devam geri sayımı, hayalet rekor
   let freezeT = 0, belts = [], comets = [], beltT = 12, cometT = 9, resumeCD = 0;
+  // yörünge mayınları, takımyıldız, oyun içi rekor kutlaması
+  let mines = [], mineT = 10, cons = null, consT = 20, recCel = false;
   let ghostRec = [], ghostRun = store.get('ghost', null), ghostT = 0, ghostPassed = false;
 
   // ---------- haftalık meydan okuma ----------
@@ -1088,7 +1091,7 @@
       i, skin, a: -Math.PI / 2 + i * Math.PI, ring: 1, r: rings[1], w: 1.25, dir: 1,
       shield: !!U_.startShield, alive: true, score: 0, combo: 0, comboT: 0,
       magnet: 0, double: 0, ghost: 0, twin: 0, nova: 0, novaT: 0, novaKills: 0, invuln: 0, revCd: 0, reviveUsed: false, trail: [],
-      fever: 0, swT: 0, swFrom: 0,
+      fever: 0, swT: 0, swFrom: 0, mini: 0,
       stats: { stars: 0, gold: 0, maxCombo: 0, powers: 0, rev: 0, near: 0 }, deathT: 0
     };
   }
@@ -1096,6 +1099,7 @@
     U_ = (mode === 'solo' || mode === 'time' || mode === 'camp') ? upg : NOUPG;
     NR = 3; setRings();
     freezeT = 0; belts = []; comets = []; beltT = 12; cometT = 9; resumeCD = 0;
+    mines = []; mineT = 10; cons = null; consT = 20; recCel = false;
     ghostRec = []; ghostT = 0; ghostPassed = false;
     if (mode === 'duo') {
       const s1 = curSkin();
@@ -1221,7 +1225,8 @@
     bomb: { k: 'B', c: '#ff4d4d', name: 'BOMBA' },
     ghost: { k: 'H', c: '#dfe3ff', name: 'HAYALET' },
     twin: { k: 'İ', c: '#9cdcff', name: 'İKİZ' },
-    freeze: { k: 'D', c: '#9be7ff', name: 'ZAMAN DONDUR' }
+    freeze: { k: 'D', c: '#9be7ff', name: 'ZAMAN DONDUR' },
+    mini: { k: 'mi', c: '#c6ff5c', name: 'MİNİ' }
   };
   function spawnPower() {
     if (isWk('guc')) return;
@@ -1244,13 +1249,27 @@
     comets.push({ sx: aim.x - dx * L, sy: aim.y - dy * L, dx, dy, len: L * 2, s: 0, warn: 1.3, sp: U * 2.4, x: 0, y: 0 });
     beep(1800, .4, 'sine', .02, -1200);
   }
+  // yörünge mayını: halkaya yerleşir, yanıp söner, birkaç saniye sonra patlar
+  function spawnMine() {
+    const r = R.rock, p = target(r);
+    mines.push({ ring: Math.floor(r() * NR), a: p.a + p.dir * (1.2 + r() * 1.4), warn: 1.0, fuse: 3.5 + r() * 1.5, boom: 0 });
+    beep(400, .15, 'square', .03, -200);
+  }
+  // takımyıldız: aynı halkada çizgiyle bağlı 5 yıldız, hepsini toplayınca bonus
+  function spawnCons() {
+    const r = R.star, p = target(r);
+    const ring = Math.floor(r() * NR), base = p.a + p.dir * 1.4, id = gt + 1;
+    cons = { id, n: 5, got: 0 };
+    for (let k = 0; k < 5; k++) stars.push({ a: base + p.dir * k * (0.42 - ring * 0.05), ring, life: 10, born: gt, gold: false, x: 0, y: 0, free: false, to: null, cons: id });
+    banner('TAKIMYILDIZ<small>5 yıldızın hepsini topla!</small>', '#ffd166');
+  }
 
   // ---------- hits ----------
   function clearDanger() {
     for (const r of rocks) { const q = pos(r.a, r.r); burst(q.x, q.y, '#ff5c7a', 6, 100); }
     for (const h of hunters) { const q = pos(h.a, rings[h.ring]); burst(q.x, q.y, '#b98bff', 6, 100); }
     for (const m of missiles) burst(m.x, m.y, '#ff9f43', 8, 100);
-    rocks = []; hunters = []; flares = []; lasers = []; missiles = []; holes = []; belts = []; comets = [];
+    rocks = []; hunters = []; flares = []; lasers = []; missiles = []; holes = []; belts = []; comets = []; mines = [];
     if (event && event.type === 'meteor') event = null;
   }
   function bombBlast(p) {
@@ -1260,6 +1279,8 @@
     for (const m of missiles) { burst(m.x, m.y, '#ff9f43', 10, 160); n++; }
     for (const h of holes) { if (h.warn > 0) continue; const q = pos(h.a, rings[h.ring]); burst(q.x, q.y, '#b98bff', 16, 200); n++; }
     for (const c of comets) { if (c.warn > 0) continue; burst(c.x, c.y, '#9be7ff', 12, 160); n++; }
+    for (const mn of mines) { const q = pos(mn.a, rings[mn.ring]); burst(q.x, q.y, '#ff6a2b', 12, 160); n++; }
+    mines = [];
     rocks = []; hunters = hunters.filter(h => h.warn > 0); missiles = []; holes = holes.filter(h => h.warn > 0); comets = comets.filter(c => c.warn > 0);
     const q = ppos(p);
     beams.push({ ring: true, x: q.x, y: q.y, life: 1 });
@@ -1555,6 +1576,7 @@
       p.ghost = Math.max(0, p.ghost - dt);
       p.twin = Math.max(0, p.twin - dt);
       p.fever = Math.max(0, p.fever - dt);
+      p.mini = Math.max(0, p.mini - dt);
       p.swT = Math.max(0, p.swT - dt);
       if (p.novaT > 0) {
         p.novaT -= dt;
@@ -1577,6 +1599,7 @@
       }
     }
     const PR = U * 0.017;
+    const prOf = p => PR * (p.mini > 0 ? 0.5 : 1); // mini gücünde çarpışma alanı küçük
     const AL = alive();
 
     // spawns
@@ -1644,6 +1667,17 @@
         if (s.gold) { beep(880, .1, 'triangle', .07); setTimeout(() => beep(1320, .2, 'triangle', .07), 90); }
         else beep(660 + Math.min(p.combo, 8) * 60, .12, 'sine', .07, 300);
         stars.splice(i, 1);
+        if (s.cons && cons && s.cons === cons.id) {
+          cons.got++;
+          if (cons.got >= cons.n) { // takımyıldız tamamlandı
+            let g = 10;
+            if (p.double > 0) g *= 2; if (mode === 'hard') g *= 2; if (p.fever > 0) g *= 2;
+            p.score += g; updHud(); cons = null;
+            banner(`TAKIMYILDIZ! <small>+${g} bonus</small>`, '#ffd166', 1.2);
+            for (let k = 0; k < 3; k++) setTimeout(() => burst(s.x + (Math.random() - .5) * 60, s.y + (Math.random() - .5) * 60, ['#ffd166', '#7cf3ff', '#ff5cf0'][k], 24, 200), k * 100);
+            chime(); buzz(40); unlock('cons');
+          }
+        }
         if (boss) damageBoss(p, s.gold ? 3 : 1);
         unlock('ilk');
         if (mode === 'zen') { if (p.stats.stars >= 50) unlock('zen'); }
@@ -1657,7 +1691,7 @@
         }
         continue;
       }
-      if (s.life <= 0) stars.splice(i, 1);
+      if (s.life <= 0) { if (s.cons && cons && s.cons === cons.id) cons = null; stars.splice(i, 1); }
     }
 
     // power-ups
@@ -1676,6 +1710,7 @@
         if (pu.type === 'ghost') got.ghost = 5;
         if (pu.type === 'twin') { got.twin = 8; unlock('twin'); }
         if (pu.type === 'freeze') { freezeT = 3; beep(1800, .5, 'sine', .04, -1400); }
+        if (pu.type === 'mini') { got.mini = 6; beep(1200, .3, 'sine', .04, 600); }
         got.stats.powers++;
         burst(pp2.x, pp2.y, P.c, 24, 200);
         floatText(pp2.x, pp2.y, (mode === 'duo' ? `P${got.i + 1} ` : '') + P.name, P.c);
@@ -1700,7 +1735,7 @@
       let removed = false;
       for (const p of alive()) {
         const q = ppos(p);
-        const d = Math.hypot(rp.x - q.x, rp.y - q.y), hitR = PR + r.size * 0.85;
+        const d = Math.hypot(rp.x - q.x, rp.y - q.y), hitR = prOf(p) + r.size * 0.85;
         if (d < hitR) {
           const res = hit(p, rp, r, rocks);
           if (res === 'stop') return;
@@ -1722,7 +1757,7 @@
       let removed = false;
       for (const p of alive()) {
         const q = ppos(p);
-        if (Math.hypot(hp.x - q.x, hp.y - q.y) < PR + U * 0.02) {
+        if (Math.hypot(hp.x - q.x, hp.y - q.y) < prOf(p) + U * 0.02) {
           const res = hit(p, hp, h, hunters);
           if (res === 'stop') return;
           if (res === 'removed') { removed = true; break; }
@@ -1768,6 +1803,39 @@
     if (mode !== 'zen' && !boss) {
       if (level >= 5) { beltT -= edt; if (beltT <= 0 && !belts.length) { spawnBelt(); beltT = Math.max(9, 18 - level * 0.5) + R.hunter() * 6; } }
       if (level >= 4) { cometT -= edt; if (cometT <= 0) { spawnComet(); cometT = Math.max(6, 14 - level * 0.4) + R.flare() * 5; } }
+      if (level >= 6) { mineT -= edt; if (mineT <= 0 && mines.length < 2) { spawnMine(); mineT = Math.max(7, 15 - level * 0.4) + R.rock() * 5; } }
+    }
+    if (level >= 2 && !boss && !event && !cons) { consT -= dt; if (consT <= 0) { spawnCons(); consT = 25 + R.star() * 10; } }
+
+    // ---- yörünge mayınları ----
+    for (let i = mines.length - 1; i >= 0; i--) {
+      const mn = mines[i];
+      if (mn.warn > 0) { mn.warn -= edt; continue; }
+      const mp = pos(mn.a, rings[mn.ring]);
+      if (mn.boom > 0) {
+        mn.boom -= edt;
+        const br = U * 0.1 * (1 - mn.boom / 0.4);
+        let stop = false;
+        for (const p of alive()) {
+          const q = ppos(p);
+          if (Math.hypot(q.x - mp.x, q.y - mp.y) < prOf(p) + br) { const res = hit(p, mp, mn, mines); if (res === 'stop') { stop = true; break; } if (res === 'removed') break; }
+        }
+        if (stop) return;
+        if (mn.boom <= 0 && mines.indexOf(mn) >= 0) mines.splice(mines.indexOf(mn), 1);
+        continue;
+      }
+      mn.fuse -= edt;
+      let removed = false;
+      for (const p of alive()) {
+        const q = ppos(p);
+        if (Math.hypot(q.x - mp.x, q.y - mp.y) < prOf(p) + U * 0.02) {
+          const res = hit(p, mp, mn, mines);
+          if (res === 'stop') return;
+          if (res === 'removed') { removed = true; break; }
+        }
+      }
+      if (removed) continue;
+      if (mn.fuse <= 0) { mn.boom = 0.4; burst(mp.x, mp.y, '#ff6a2b', 26, 220); shake = Math.max(shake, 7); buzz(50); beep(70, .5, 'sawtooth', .08, -40); }
     }
 
     // ---- asteroit kuşakları ----
@@ -1797,7 +1865,7 @@
       let removed = false;
       for (const p of alive()) {
         const q = ppos(p);
-        if (Math.hypot(q.x - c.x, q.y - c.y) < PR + U * 0.018) {
+        if (Math.hypot(q.x - c.x, q.y - c.y) < prOf(p) + U * 0.018) {
           const res = hit(p, { x: c.x, y: c.y }, c, comets);
           if (res === 'stop') return;
           if (res === 'removed') { removed = true; break; }
@@ -1845,7 +1913,7 @@
       let removed = false;
       for (const p of alive()) {
         const q = ppos(p);
-        if (Math.hypot(q.x - m.x, q.y - m.y) < PR + U * 0.014) {
+        if (Math.hypot(q.x - m.x, q.y - m.y) < prOf(p) + U * 0.014) {
           const res = hit(p, { x: m.x, y: m.y }, m, missiles);
           if (res === 'stop') return;
           if (res === 'removed') { removed = true; break; }
@@ -1869,12 +1937,12 @@
       for (let j = stars.length - 1; j >= 0; j--) {
         const st = stars[j];
         const d = Math.hypot(st.x - hp.x, st.y - hp.y);
-        if (d < U * 0.12) { st.free = true; st.to = null; st.x += (hp.x - st.x) * Math.min(1, dt * 3); st.y += (hp.y - st.y) * Math.min(1, dt * 3); if (d < U * 0.015) { stars.splice(j, 1); burst(hp.x, hp.y, '#b98bff', 6, 60); } }
+        if (d < U * 0.12) { st.free = true; st.to = null; st.x += (hp.x - st.x) * Math.min(1, dt * 3); st.y += (hp.y - st.y) * Math.min(1, dt * 3); if (d < U * 0.015) { if (st.cons && cons && st.cons === cons.id) cons = null; stars.splice(j, 1); burst(hp.x, hp.y, '#b98bff', 6, 60); } }
       }
       let removed = false;
       for (const p of alive()) {
         const q = ppos(p);
-        if (Math.hypot(q.x - hp.x, q.y - hp.y) < PR + U * 0.026) {
+        if (Math.hypot(q.x - hp.x, q.y - hp.y) < prOf(p) + U * 0.026) {
           const res = hit(p, hp, h, holes);
           if (res === 'stop') return;
           if (res === 'removed') { removed = true; break; }
@@ -1903,6 +1971,16 @@
       }
       if (removed) continue;
       if (f.active <= 0) flares.splice(i, 1);
+    }
+
+    // oyun içinde rekor kırılınca kutlama
+    const recB = mode === 'solo' ? best : (mode === 'hard' ? hardBest : (mode === 'time' ? timeBest : 0));
+    if (!recCel && recB > 0 && P0().alive && P0().score > recB) {
+      recCel = true;
+      banner('YENİ REKOR! 🚀', '#ffd166', 1.5);
+      const q = ppos(P0());
+      for (let k = 0; k < 5; k++) setTimeout(() => fxParts(parts, q.x + (Math.random() - .5) * 120, q.y + (Math.random() - .5) * 120, ['#ffd166', '#7cf3ff', '#ff5cf0', '#5cff9d', '#ff9f43'][k], 30, 240, 'konfeti'), k * 120);
+      chime(); setTimeout(chime, 200); buzz(60);
     }
 
     if (shake > 0) shake = Math.max(0, shake - dt * 30);
@@ -1942,6 +2020,7 @@
       if (p.ghost > 0) h += bar(pre + 'HAYALET', '#dfe3ff', p.ghost, 5);
       if (p.twin > 0) h += bar(pre + 'İKİZ', '#9cdcff', p.twin, 8);
       if (p.fever > 0) h += bar(pre + 'ÇILGINLIK', '#ff5cf0', p.fever, 5);
+      if (p.mini > 0) h += bar(pre + 'MİNİ', '#c6ff5c', p.mini, 6);
     }
     if (h !== lastPowHtml) { $('powers').innerHTML = h; lastPowHtml = h; }
   }
@@ -2410,6 +2489,42 @@
         }
       }
 
+      // takımyıldız çizgileri
+      if (cons) {
+        const cs = stars.filter(s => s.cons === cons.id);
+        if (cs.length > 1) {
+          ctx.strokeStyle = 'rgba(255,209,102,.35)'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 6]);
+          ctx.beginPath(); cs.forEach((s, k) => { const sp = pos(s.a, rings[s.ring]); k ? ctx.lineTo(sp.x, sp.y) : ctx.moveTo(sp.x, sp.y); }); ctx.stroke(); ctx.setLineDash([]);
+        }
+      }
+      // yörünge mayınları
+      for (const mn of mines) {
+        const mp = pos(mn.a, rings[mn.ring]);
+        if (mn.warn > 0) {
+          ctx.globalAlpha = Math.sin(t * 18) > 0 ? .8 : .2;
+          ctx.strokeStyle = '#ff6a2b'; ctx.lineWidth = 2; ctx.setLineDash([3, 4]);
+          ctx.beginPath(); ctx.arc(mp.x, mp.y, U * 0.025, 0, 6.283); ctx.stroke(); ctx.setLineDash([]);
+          ctx.globalAlpha = 1; continue;
+        }
+        if (mn.boom > 0) {
+          const k = 1 - mn.boom / 0.4;
+          ctx.globalAlpha = 1 - k * 0.7; ctx.fillStyle = 'rgba(255,106,43,.35)'; ctx.strokeStyle = '#ffb36b'; ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.arc(mp.x, mp.y, U * 0.1 * k, 0, 6.283); ctx.fill(); ctx.stroke();
+          ctx.globalAlpha = 1; continue;
+        }
+        const fast = mn.fuse < 1.2;
+        const on = Math.sin(t * (fast ? 30 : 10)) > 0;
+        ctx.strokeStyle = 'rgba(255,106,43,.25)'; ctx.lineWidth = 1; ctx.setLineDash([2, 5]);
+        ctx.beginPath(); ctx.arc(mp.x, mp.y, U * 0.1, 0, 6.283); ctx.stroke(); ctx.setLineDash([]);
+        ctx.save(); ctx.translate(mp.x, mp.y); ctx.rotate(t * 1.5);
+        ctx.fillStyle = '#3a1a10'; ctx.strokeStyle = '#ff6a2b'; ctx.lineWidth = 2;
+        for (let j = 0; j < 8; j++) { ctx.rotate(Math.PI / 4); ctx.beginPath(); ctx.moveTo(0, -U * 0.014); ctx.lineTo(0, -U * 0.024); ctx.stroke(); }
+        ctx.beginPath(); ctx.arc(0, 0, U * 0.016, 0, 6.283); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = on ? '#ff3d2b' : '#5a1a10'; ctx.shadowColor = '#ff3d2b'; ctx.shadowBlur = on ? 16 : 0;
+        ctx.beginPath(); ctx.arc(0, 0, U * 0.006, 0, 6.283); ctx.fill(); ctx.shadowBlur = 0;
+        ctx.restore();
+      }
+
       for (const s of stars) {
         if (!s.free) { const sp = pos(s.a, rings[s.ring]); s.x = sp.x; s.y = sp.y; }
         const fade = Math.min(1, s.life / 1.2, (gt - s.born) * 4);
@@ -2645,7 +2760,7 @@
           ctx.shadowBlur = 0;
         }
         if (p.ghost > 0) ctx.globalAlpha = 0.35 + Math.sin(t * 10) * 0.1;
-        if (!flick) drawSkin(ctx, q.x, q.y, U * 0.017 * (p.novaT > 0 ? 1.3 : 1), sk, t);
+        if (!flick) drawSkin(ctx, q.x, q.y, U * 0.017 * (p.novaT > 0 ? 1.3 : 1) * (p.mini > 0 ? 0.55 : 1), sk, t);
         ctx.globalAlpha = 1;
         if (mode === 'duo' && state === 'play' && p.nova > 0 && p.novaT <= 0) {
           ctx.strokeStyle = 'rgba(255,159,67,.55)'; ctx.lineWidth = 2.5;
