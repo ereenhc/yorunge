@@ -490,6 +490,16 @@
   <button class="ghost back">← Geri</button>
 </div>
 
+<!-- DUO SETUP -->
+<div class="panel hidden" id="duoSetup">
+  <h2>2 KİŞİ</h2>
+  <p>Kaç tur oynayacaksınız? Her turu kazanan 1 puan alır, turlar bitince maçı kimin kazandığını görürsünüz.</p>
+  <div class="seg" id="roundSeg"><button data-n="1">1</button><button data-n="3" class="on">3</button><button data-n="5">5</button><button data-n="7">7</button></div>
+  <p class="small">Sol yarı 1. oyuncu, sağ yarı 2. oyuncu · üste dokun = dışa, alta = içe</p>
+  <button class="main" id="duoGo">BAŞLAT</button>
+  <button class="ghost back">← Geri</button>
+</div>
+
 <!-- TURN NEXT -->
 <div class="panel hidden" id="turnNext">
   <div class="small" id="tnPrev"></div>
@@ -1085,6 +1095,9 @@
   let timeBest = store.get('timeBest', 0);
   const TIME_LIMIT = 60;
   let turns = null; // {count, names, seed, idx, results:[]}
+  // 2 kişi maçı: tur sayısı, tur galibiyetleri ve toplam puanlar
+  let duoRounds = store.get('duoRounds', 3), duoMatch = null;
+  const newDuo = n => ({ total: n, round: 1, wins: [0, 0], pts: [0, 0], done: false });
   let lastShare = null; // {lines, text}
 
   function makePlayer(i, skin) {
@@ -1131,7 +1144,7 @@
       $('hudLL').textContent = mode === 'turns' ? turns.names[turns.idx] : (mode === 'zen' ? 'Yıldız' : 'Skor'); $('hudLL').style.color = '';
       $('hudRL').textContent = { daily: 'Bugün en iyi', turns: 'Lider', time: 'En iyi', zen: 'Mod', hard: 'Hardcore rekor', camp: 'En iyi', weekly: 'Hedef' }[mode] || 'Rekor'; $('hudRL').style.color = mode === 'hard' ? '#ff5c7a' : '';
     }
-    $('hudML').textContent = mode === 'daily' ? 'Meydan okuma · Sv' : (mode === 'time' ? 'Kalan süre' : (mode === 'camp' ? `Bölüm ${campIdx + 1} · Hedef` : 'Seviye'));
+    $('hudML').textContent = (mode === 'duo' && duoMatch) ? `Tur ${duoMatch.round}/${duoMatch.total} · ${duoMatch.wins[0]}-${duoMatch.wins[1]} · Sv` : mode === 'daily' ? 'Meydan okuma · Sv' : (mode === 'time' ? 'Kalan süre' : (mode === 'camp' ? `Bölüm ${campIdx + 1} · Hedef` : 'Seviye'));
     updHud();
   }
   function updHud() {
@@ -2072,6 +2085,32 @@
       msg = winner ? `🏆 ${winner.i + 1}. Oyuncu kazandı!` : '🤝 Berabere!';
       const lastAlive = a.deathT > b.deathT ? a : b;
       note = `${lastAlive.i + 1}. Oyuncu daha uzun hayatta kaldı`;
+      if (duoMatch) {
+        const M = duoMatch;
+        // puan eşitse turu daha uzun dayanan alır
+        const tieBy = !winner && a.deathT !== b.deathT;
+        const rw = winner || (tieBy ? lastAlive : null);
+        if (rw) M.wins[rw.i]++;
+        M.pts[0] += a.score; M.pts[1] += b.score;
+        M.done = M.round >= M.total;
+        const ser = `P1 ${M.wins[0]} – ${M.wins[1]} P2`;
+        if (M.done) {
+          // eşit tur galibiyetinde toplam puan belirler
+          const mw = M.wins[0] !== M.wins[1] ? (M.wins[0] > M.wins[1] ? 0 : 1) : (M.pts[0] === M.pts[1] ? null : (M.pts[0] > M.pts[1] ? 0 : 1));
+          title = `MAÇ BİTTİ · ${M.total} TUR`;
+          scoreTxt = `<span style="color:${solidOf(a.skin)}">${M.wins[0]}</span> <span style="opacity:.4">–</span> <span style="color:${solidOf(b.skin)}">${M.wins[1]}</span>`;
+          msg = mw === null ? '🤝 Maç berabere!' : `🏆 ${mw + 1}. Oyuncu maçı kazandı!`;
+          note = `Son tur: ${a.score} – ${b.score} · Toplam puan: P1 ${M.pts[0]} – ${M.pts[1]} P2` + (M.wins[0] === M.wins[1] && mw !== null ? ' (eşitliği toplam puan bozdu)' : '');
+          lastShare = {
+            head: `2 KİŞİLİK MAÇ · ${M.total} TUR`, big: `${M.wins[0]} – ${M.wins[1]}`, sub: mw === null ? 'Berabere!' : `${mw + 1}. Oyuncu kazandı!`,
+            skins: [a.skin, b.skin], text: `Yörünge'de ${M.total} turluk maç: ${M.wins[0]} – ${M.wins[1]}. ${mw === null ? 'Berabere! 🤝' : mw + 1 + '. oyuncu kazandı! 🏆'}`
+          };
+          chime(); setTimeout(chime, 250);
+        } else {
+          title = `TUR ${M.round} / ${M.total}`;
+          msg = (rw ? `🏆 Turu ${rw.i + 1}. Oyuncu aldı${tieBy ? ' (puan eşit, daha uzun dayandı)' : ''}` : '🤝 Tur berabere') + `  ·  Maç: ${ser}`;
+        }
+      }
       statsHtml = [
         ['P1 yıldız', a.stats.stars], ['P1 kombo', a.stats.maxCombo], ['P2 yıldız', b.stats.stars], ['P2 kombo', b.stats.maxCombo]
       ].map(([k, v]) => `<div><b>${v}</b><span>${k}</span></div>`).join('');
@@ -2181,6 +2220,7 @@
     }
     saveAll();
     $('overTitle').textContent = title;
+    $('againBtn').textContent = (mode === 'duo' && duoMatch) ? (duoMatch.done ? 'RÖVANŞ' : 'SONRAKİ TUR ▶') : 'TEKRAR';
     if (mode !== 'camp') $('nextBtn').style.display = 'none';
     $('mapBtn2').style.display = mode === 'camp' ? '' : 'none';
     $('overShop').style.display = mode === 'camp' ? 'none' : '';
@@ -3132,7 +3172,7 @@
   }
 
   let panelOpen = 'menu', backTo = 'menu';
-  const PANELS = ['menu', 'over', 'pause', 'shop', 'missions', 'help', 'turnsSetup', 'turnNext', 'turnsResult', 'cardModal', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'];
+  const PANELS = ['menu', 'over', 'pause', 'shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'turnNext', 'turnsResult', 'cardModal', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'];
   function show(id) {
     PANELS.forEach(p => $(p).classList.toggle('hidden', p !== id)); panelOpen = id;
     $('menu').classList.remove('drawer-open');
@@ -3163,7 +3203,11 @@
     if (P0().shield) floatText(cx, cy - rings[1] - 30, 'KALKAN AKTİF', '#7cf3ff');
     if (mode === 'daily') banner(`GÜNÜN MEYDAN OKUMASI<small>${todayStr()} · herkese aynı parkur</small>`, '#ffd166');
     if (mode === 'turns') banner(esc(turns.names[turns.idx]), '#7cf3ff');
-    if (mode === 'duo') { banner('2 KİŞİ<small>Sol yarı P1 · sağ yarı P2</small>', '#e8ecff'); unlock('duo'); }
+    if (mode === 'duo') {
+      const M = duoMatch;
+      banner(M ? `TUR ${M.round} / ${M.total}<small>Maç: P1 ${M.wins[0]} – ${M.wins[1]} P2</small>` : '2 KİŞİ<small>Sol yarı P1 · sağ yarı P2</small>', '#e8ecff', 1.5);
+      unlock('duo');
+    }
     if (mode === 'daily') unlock('daily');
     if (mode === 'time') banner('60 SANİYE<small>Çarpınca −5 puan</small>', '#7cf3ff');
     if (mode === 'hard') banner('HARDCORE 💀<small>%35 hızlı · 2x puan</small>', '#ff5c7a');
@@ -3179,6 +3223,7 @@
   function again() {
     if (mode === 'turns') return;
     if (mode === 'camp') { startCamp(campIdx); return; }
+    if (mode === 'duo') { if (!duoMatch || duoMatch.done) duoMatch = newDuo(duoMatch ? duoMatch.total : duoRounds); else duoMatch.round++; }
     startMode(mode);
   }
   function pause() {
@@ -3196,14 +3241,14 @@
     if ($('menu').classList.contains('drawer-open')) { $('menu').classList.remove('drawer-open'); return 'ok'; }
     if (state === 'play' || state === 'pause') { if (state === 'play' || resumeCD <= 0) pause(); return 'ok'; }
     if (panelOpen === 'cardModal') { show(cardBack); return 'ok'; }
-    if (['shop', 'missions', 'help', 'turnsSetup', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'].includes(panelOpen)) { show(backTo); refreshMeta(); return 'ok'; }
+    if (['shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'].includes(panelOpen)) { show(backTo); refreshMeta(); return 'ok'; }
     if (state === 'over' || panelOpen === 'over' || panelOpen === 'turnNext' || panelOpen === 'turnsResult') { toMenu(); return 'ok'; }
     if (Date.now() - backExitT < 2000) return 'exit';
     backExitT = Date.now(); toast('Çıkmak için tekrar geri bas'); return 'ok';
   };
   function toMenu() {
     $('hint').classList.remove('show'); $('novaBar').style.display = 'none'; tut = false;
-    state = 'menu'; mode = 'solo'; turns = null; setRng(null); reset(); show('menu'); refreshMeta();
+    state = 'menu'; mode = 'solo'; turns = null; duoMatch = null; setRng(null); reset(); show('menu'); refreshMeta();
     $('revBtn').style.display = 'none'; showZones(false); $('powers').innerHTML = ''; lastPowHtml = '';
   }
 
@@ -3211,7 +3256,11 @@
   const on = (id, fn) => $(id).addEventListener('click', e => { e.stopPropagation(); fn(); });
   on('startBtn', () => startMode('solo'));
   on('dailyBtn', () => startMode('daily'));
-  on('duoBtn', () => startMode('duo'));
+  // 2 kişi: önce kaç tur oynanacağını sor
+  const renderRoundSeg = () => document.querySelectorAll('#roundSeg button').forEach(b => b.classList.toggle('on', +b.dataset.n === duoRounds));
+  on('duoBtn', () => { renderRoundSeg(); openSub('duoSetup', 'menu'); });
+  document.querySelectorAll('#roundSeg button').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); duoRounds = +b.dataset.n; store.set('duoRounds', duoRounds); renderRoundSeg(); }));
+  on('duoGo', () => { duoMatch = newDuo(duoRounds); startMode('duo'); });
   on('timeBtn', () => startMode('time'));
   on('zenBtn', () => startMode('zen'));
   on('hardBtn', () => startMode('hard'));
@@ -3302,7 +3351,7 @@
     if (k === 'Escape' && $('menu').classList.contains('drawer-open')) { $('menu').classList.remove('drawer-open'); return; }
     if (k === 'Escape') {
       if (state === 'play' || state === 'pause') pause();
-      else if (['shop', 'missions', 'help', 'turnsSetup', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'].includes(panelOpen)) show(backTo);
+      else if (['shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'].includes(panelOpen)) show(backTo);
       else if (panelOpen === 'cardModal') show(cardBack);
       return;
     }
