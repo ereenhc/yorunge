@@ -624,7 +624,7 @@
   let coins = store.get('coins', 0);
   let owned = store.get('owned', null);
   let skinId = store.get('skinId', null);
-  let upg = Object.assign({ magnet: 0, slow: 0, combo: 0, powerFreq: 0, startShield: 0, revive: 0, sat: 0, nova: 0 }, store.get('upg', {}));
+  let upg = Object.assign({ magnet: 0, slow: 0, combo: 0, powerFreq: 0, startShield: 0, revive: 0, sat: 0, nova: 0, coinUp: 0, goldUp: 0, nearUp: 0, feverUp: 0, consUp: 0, freezeUp: 0, miniUp: 0, revUp: 0, startMag: 0 }, store.get('upg', {}));
   let daily = store.get('daily', { key: 0, best: 0, plays: 0 });
   let turnNames = store.get('turnNames', ['Oyuncu 1', 'Oyuncu 2', 'Oyuncu 3', 'Oyuncu 4']);
 
@@ -860,9 +860,19 @@
     { id: 'startShield', name: 'Başlangıç Kalkanı', ic: 'K', c: '#7cf3ff', max: 1, cost: [400], ds: () => 'Her oyuna kalkanla başla' },
     { id: 'revive', name: 'İkinci Şans', ic: '♥', c: '#ff5c7a', max: 1, cost: [1000], ds: () => 'Her oyunda bir kez ölümden dön' },
     { id: 'sat', name: 'Uydu', ic: '◉', c: '#9cdcff', max: 3, cost: [300, 700, 1400], ds: l => l ? `${l} uydu etrafında döner, yıldız toplar` : 'Etrafında dönen uydu yıldız toplar' },
-    { id: 'nova', name: 'Çekirdek Füzyon', ic: '☀', c: '#ff9f43', max: 2, cost: [400, 900], ds: l => `Süpernova barı %${[0, 30, 60][l]} daha hızlı dolar` }
+    { id: 'nova', name: 'Çekirdek Füzyon', ic: '☀', c: '#ff9f43', max: 2, cost: [400, 900], ds: l => `Süpernova barı %${[0, 30, 60][l]} daha hızlı dolar` },
+    // --- yeni yükseltmeler ---
+    { id: 'coinUp', name: 'Hazine Avcısı', ic: '💰', c: '#ffd166', max: 3, cost: [400, 900, 1800], ds: l => l ? `Oyun sonu ✦ kazancı +%${l * 15}` : 'Oyun sonu ✦ kazancın artar' },
+    { id: 'goldUp', name: 'Altın Şans', ic: '🪙', c: '#ffb000', max: 3, cost: [250, 550, 1100], ds: l => `Altın yıldız ihtimali %${10 + l * 5}` },
+    { id: 'nearUp', name: 'Sıyırma Ustası', ic: '😅', c: '#5cff9d', max: 3, cost: [200, 450, 900], ds: l => `Kıl payı puanı +${2 + l}` },
+    { id: 'feverUp', name: 'Çılgın Ritim', ic: '🌈', c: '#ff5cf0', max: 2, cost: [300, 700], ds: l => `Çılgınlık süresi ${5 + l * 1.5} sn` },
+    { id: 'consUp', name: 'Takımyıldız Ustası', ic: '✨', c: '#ffd166', max: 2, cost: [300, 700], ds: l => `Takımyıldız bonusu +${10 + l * 5}` },
+    { id: 'freezeUp', name: 'Buz Çağı', ic: '❄', c: '#9be7ff', max: 2, cost: [250, 600], ds: l => `Zaman Dondur süresi ${3 + l} sn` },
+    { id: 'miniUp', name: 'Küçülme Uzmanı', ic: 'mi', c: '#c6ff5c', max: 2, cost: [250, 600], ds: l => `Mini gücü süresi ${6 + l * 2} sn` },
+    { id: 'revUp', name: 'Çevik Dönüş', ic: '⟲', c: '#7cf3ff', max: 2, cost: [300, 700], ds: l => `Yön değiştirme bekleme süresi ${[1, 0.7, 0.45][l]} sn` },
+    { id: 'startMag', name: 'Hazır Mıknatıs', ic: 'M', c: '#ff9f43', max: 1, cost: [500], ds: () => 'Her oyuna 6 sn mıknatısla başla' }
   ];
-  const NOUPG = { magnet: 0, slow: 0, combo: 0, powerFreq: 0, startShield: 0, revive: 0, sat: 0, nova: 0 };
+  const NOUPG = { magnet: 0, slow: 0, combo: 0, powerFreq: 0, startShield: 0, revive: 0, sat: 0, nova: 0, coinUp: 0, goldUp: 0, nearUp: 0, feverUp: 0, consUp: 0, freezeUp: 0, miniUp: 0, revUp: 0, startMag: 0 };
   let U_ = upg; // upgrades active in the current game
 
   // ================= MISSIONS =================
@@ -1151,7 +1161,7 @@
     return {
       i, skin, a: -Math.PI / 2 + i * Math.PI, ring: 1, r: rings[1], w: 1.25, dir: 1,
       shield: !!U_.startShield, alive: true, score: 0, combo: 0, comboT: 0,
-      magnet: 0, double: 0, ghost: 0, twin: 0, nova: 0, novaT: 0, novaKills: 0, invuln: 0, revCd: 0, reviveUsed: false, trail: [],
+      magnet: U_.startMag ? 6 : 0, double: 0, ghost: 0, twin: 0, nova: 0, novaT: 0, novaKills: 0, invuln: 0, revCd: 0, reviveUsed: false, trail: [],
       fever: 0, swT: 0, swFrom: 0, mini: 0,
       stats: { stars: 0, gold: 0, maxCombo: 0, powers: 0, rev: 0, near: 0 }, deathT: 0
     };
@@ -1242,7 +1252,7 @@
   }
   function reverse(p) {
     if (state !== 'play' || !p || !p.alive || p.revCd > 0) return;
-    p.dir *= -1; p.revCd = 1.0; p.stats.rev++;
+    p.dir *= -1; p.revCd = [1, 0.7, 0.45][U_.revUp || 0]; p.stats.rev++;
     if (lasers.length) unlock('laser');
     tutRev = true;
     const q = ppos(p);
@@ -1256,7 +1266,7 @@
   function spawnStar(anyAngle) {
     const r = R.star;
     const allGold = isWk('altin');
-    const gold = allGold || (topScore() >= 5 && r() < 0.1);
+    const gold = allGold || (topScore() >= 5 && r() < 0.1 + (U_.goldUp || 0) * 0.05);
     const a = anyAngle ? r() * 6.283 : aheadAngle(r, 0.5, 1.6);
     stars.push({ a, ring: Math.floor(r() * NR), life: allGold ? 2.5 : (gold ? 4 : 7), born: gt, gold, x: 0, y: 0, free: false, to: null });
   }
@@ -1529,16 +1539,17 @@
   }
 
   // ---------- çılgınlık modu & kıl payı ----------
+  const feverDur = () => 5 + (U_.feverUp || 0) * 1.5;
   function startFever(p) {
-    p.fever = 5;
-    banner('ÇILGINLIK!<small>5 sn · 2x puan</small>', '#ff5cf0', 1.2);
+    p.fever = feverDur();
+    banner(`ÇILGINLIK!<small>${feverDur()} sn · 2x puan</small>`, '#ff5cf0', 1.2);
     shake = Math.max(shake, 8); buzz(80);
     beep(330, .3, 'sawtooth', .05, 660); setTimeout(chime, 120);
     unlock('fever');
   }
   function nearMiss(p, at) {
     if (!p.alive || mode === 'zen') return;
-    let g = 2;
+    let g = 2 + (U_.nearUp || 0);
     if (p.double > 0) g *= 2;
     if (mode === 'hard') g *= 2;
     if (p.fever > 0) g *= 2;
@@ -1732,7 +1743,7 @@
         if (s.cons && cons && s.cons === cons.id) {
           cons.got++;
           if (cons.got >= cons.n) { // takımyıldız tamamlandı
-            let g = 10;
+            let g = 10 + (U_.consUp || 0) * 5;
             if (p.double > 0) g *= 2; if (mode === 'hard') g *= 2; if (p.fever > 0) g *= 2;
             p.score += g; updHud(); cons = null;
             banner(`TAKIMYILDIZ! <small>+${g} bonus</small>`, '#ffd166', 1.2);
@@ -1771,8 +1782,8 @@
         if (pu.type === 'double') got.double = 8;
         if (pu.type === 'ghost') got.ghost = 5;
         if (pu.type === 'twin') { got.twin = 8; unlock('twin'); }
-        if (pu.type === 'freeze') { freezeT = 3; beep(1800, .5, 'sine', .04, -1400); }
-        if (pu.type === 'mini') { got.mini = 6; beep(1200, .3, 'sine', .04, 600); }
+        if (pu.type === 'freeze') { freezeT = 3 + (U_.freezeUp || 0); beep(1800, .5, 'sine', .04, -1400); }
+        if (pu.type === 'mini') { got.mini = 6 + (U_.miniUp || 0) * 2; beep(1200, .3, 'sine', .04, 600); }
         got.stats.powers++;
         burst(pp2.x, pp2.y, P.c, 24, 200);
         floatText(pp2.x, pp2.y, (mode === 'duo' ? `P${got.i + 1} ` : '') + P.name, P.c);
@@ -2071,7 +2082,7 @@
     let h = '';
     const bar = (lbl, c, v, max) => `<div class="pw" style="color:${c}">${lbl} <span class="bar"><i style="width:${v / max * 100}%;background:${c}"></i></span></div>`;
     if (slowT > 0) h += bar('YAVAŞ', '#5cff9d', slowT, 6 + U_.slow * 1.5);
-    if (freezeT > 0) h += bar('DONDU', '#9be7ff', freezeT, 3);
+    if (freezeT > 0) h += bar('DONDU', '#9be7ff', freezeT, 3 + (U_.freezeUp || 0));
     for (const p of players) {
       if (!p.alive) continue;
       const pre = mode === 'duo' ? `P${p.i + 1} ` : '';
@@ -2081,8 +2092,8 @@
       if (p.double > 0) h += bar(pre + '2X PUAN', '#ff5cf0', p.double, 8);
       if (p.ghost > 0) h += bar(pre + 'HAYALET', '#dfe3ff', p.ghost, 5);
       if (p.twin > 0) h += bar(pre + 'İKİZ', '#9cdcff', p.twin, 8);
-      if (p.fever > 0) h += bar(pre + 'ÇILGINLIK', '#ff5cf0', p.fever, 5);
-      if (p.mini > 0) h += bar(pre + 'MİNİ', '#c6ff5c', p.mini, 6);
+      if (p.fever > 0) h += bar(pre + 'ÇILGINLIK', '#ff5cf0', p.fever, feverDur());
+      if (p.mini > 0) h += bar(pre + 'MİNİ', '#c6ff5c', p.mini, 6 + (U_.miniUp || 0) * 2);
     }
     if (h !== lastPowHtml) { $('powers').innerHTML = h; lastPowHtml = h; }
   }
@@ -2115,7 +2126,8 @@
     $('powers').innerHTML = ''; lastPowHtml = '';
     $('revBtn').style.display = 'none'; showZones(false);
     const earned = players.reduce((a, p) => a + p.score, 0);
-    coins += earned;
+    const coinBonus = Math.round(earned * (U_.coinUp || 0) * 0.15); // Hazine Avcısı yükseltmesi
+    coins += earned + coinBonus;
     if (mode !== 'zen') addXp(earned + bossKills * 20);
     $('novaBar').style.display = 'none'; $('hint').classList.remove('show'); tut = false;
     if (!store.get('tutDone', false)) store.set('tutDone', true);
@@ -2287,7 +2299,7 @@
     $('overShop').style.display = mode === 'camp' ? 'none' : '';
     $('finalScore').innerHTML = scoreTxt;
     $('overMsg').textContent = msg;
-    $('earned').textContent = `+${earned} ✦  ·  +${earned + bossKills * 20} XP  ·  Toplam ✦ ${coins}`;
+    $('earned').textContent = `+${earned + coinBonus} ✦${coinBonus ? ` (💰+${coinBonus})` : ''}  ·  +${earned + bossKills * 20} XP  ·  Toplam ✦ ${coins}`;
     $('overNote').textContent = note;
     $('stats').innerHTML = statsHtml;
     refreshMeta(); updHud();
