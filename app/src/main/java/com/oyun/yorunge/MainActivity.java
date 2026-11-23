@@ -29,6 +29,9 @@ import java.io.FileOutputStream;
 public class MainActivity extends Activity {
 
     private WebView webView;
+    // Uygulama kısayolundan gelen mod (daily / weekly / wheel); sayfa yüklenince çalıştırılır
+    private String pendingMode;
+    private boolean pageReady;
     // Güvenli alan boşlukları (CSS px) — çentik / yuvarlak köşe için
     private float insetTop, insetBottom, insetLeft, insetRight;
 
@@ -70,6 +73,8 @@ public class MainActivity extends Activity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 pushInsetsToPage();
+                pageReady = true;
+                runPendingShortcut();
             }
         });
         webView.setOnApplyWindowInsetsListener((v, insets) -> {
@@ -82,6 +87,8 @@ public class MainActivity extends Activity {
 
         webView.loadUrl("file:///android_asset/index.html");
 
+        pendingMode = getIntent() != null ? getIntent().getStringExtra("mode") : null;
+
         // Günlük hatırlatma: açılışı kaydet, 19:00 alarmını kur, ilk açılışta bildirim iznini bir kez sor
         NotifReceiver.markOpened(this);
         NotifReceiver.schedule(this);
@@ -89,6 +96,23 @@ public class MainActivity extends Activity {
             NotifReceiver.prefs(this).edit().putBoolean("asked", true).apply();
             requestNotifPermission();
         }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        String m = intent.getStringExtra("mode");
+        if (m != null) { pendingMode = m; runPendingShortcut(); }
+    }
+
+    /** Kısayoldan gelen modu oyuna iletir (sadece küçük harf izinli, güvenlik için). */
+    private void runPendingShortcut() {
+        if (!pageReady || pendingMode == null || webView == null) return;
+        String m = pendingMode.replaceAll("[^a-z]", "");
+        pendingMode = null;
+        if (m.isEmpty()) return;
+        webView.evaluateJavascript("window.yorungeShortcut && yorungeShortcut('" + m + "')", null);
     }
 
     private void requestNotifPermission() {
@@ -104,6 +128,7 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void syncNotif(String json) {
             NotifReceiver.saveState(MainActivity.this, json);
+            YorungeWidget.refreshAll(MainActivity.this); // ana ekran widget'ı güncel kalsın
         }
 
         @JavascriptInterface

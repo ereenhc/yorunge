@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ana ekran widget'ı arka planı: koyu uzay rengi, ince turkuaz kenar -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="#F005060F" />
+    <stroke android:width="1dp" android:color="#557CF3FF" />
+    <corners android:radius="20dp" />
+</shape>

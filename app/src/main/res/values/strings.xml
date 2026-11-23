@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Yörünge</string>
+    <string name="widget_desc">Serin, rekorun ve günlük ödül durumu</string>
+    <string name="sc_daily_short">Meydan Okuma</string>
+    <string name="sc_daily_long">Günün Meydan Okuması</string>
+    <string name="sc_weekly_short">Haftalık</string>
+    <string name="sc_weekly_long">Haftalık Meydan Okuma</string>
+    <string name="sc_wheel_short">Şans Çarkı</string>
+    <string name="sc_wheel_long">Şans Çarkını Çevir</string>
 </resources>

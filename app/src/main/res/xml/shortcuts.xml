@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Uygulama ikonuna uzun basınca çıkan kısayollar -->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutId="daily"
+        android:shortcutShortLabel="@string/sc_daily_short"
+        android:shortcutLongLabel="@string/sc_daily_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.oyun.yorunge.MainActivity"
+            android:targetPackage="com.oyun.yorunge">
+            <extra android:name="mode" android:value="daily" />
+        </intent>
+    </shortcut>
+    <shortcut
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutId="weekly"
+        android:shortcutShortLabel="@string/sc_weekly_short"
+        android:shortcutLongLabel="@string/sc_weekly_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.oyun.yorunge.MainActivity"
+            android:targetPackage="com.oyun.yorunge">
+            <extra android:name="mode" android:value="weekly" />
+        </intent>
+    </shortcut>
+    <shortcut
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutId="wheel"
+        android:shortcutShortLabel="@string/sc_wheel_short"
+        android:shortcutLongLabel="@string/sc_wheel_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.oyun.yorunge.MainActivity"
+            android:targetPackage="com.oyun.yorunge">
+            <extra android:name="mode" android:value="wheel" />
+        </intent>
+    </shortcut>
+</shortcuts>

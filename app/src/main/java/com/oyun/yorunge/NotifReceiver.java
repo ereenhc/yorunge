@@ -42,7 +42,8 @@ public class NotifReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (ACTION_REMIND.equals(intent.getAction())) maybeNotify(context);
-        schedule(context); // hem alarmdan sonra hem telefon açılışında bir sonrakini kur
+        schedule(context);
+        YorungeWidget.refreshAll(context); // yeni gün: widget'taki "günlük ödül" durumunu tazele // hem alarmdan sonra hem telefon açılışında bir sonrakini kur
     }
 
     static SharedPreferences prefs(Context c) {

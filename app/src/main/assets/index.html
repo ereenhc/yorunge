@@ -330,6 +330,8 @@
     <button class="mode" id="timeBtn"><div class="em">⏱️</div><div><b>Zamana Karşı</b><br><span id="timeInfo">60 saniye, ölüm yok</span></div></button>
     <button class="mode" id="zenBtn"><div class="em">🧘</div><div><b>Zen</b><br><span>Düşman yok, sadece yıldız</span></div></button>
     <button class="mode" id="hardBtn"><div class="em">💀</div><div><b>Hardcore</b><br><span id="hardInfo">Her şey hızlı · 2x puan</span></div></button>
+    <button class="mode" id="mirrorBtn"><div class="em">🔄</div><div><b>Ters Dünya</b><br><span id="mirrorInfo">Kontroller ters, yön döner</span></div></button>
+    <button class="mode" id="rushBtn"><div class="em">👹</div><div><b>Boss Akını</b><br><span id="rushInfo">Sadece boss savaşları</span></div></button>
   </div>
   <div class="row">
     <button class="ghost" id="shopBtn">🛒 Mağaza</button>
@@ -365,7 +367,7 @@
   <p style="font-size:14px"><b style="color:#ff5cf0">Boss:</b> Her 5 seviyede güneş kararır ve <b>Kara Güneş</b> olur. Sana ateş eder; topladığın her yıldız ona ışın gönderir (altın yıldız 3 hasar). Yenince +20 puan!</p>
   <p style="font-size:14px"><b>Modlar:</b> 📅 Günün Meydan Okumasında o gün herkese aynı göktaşı ve yıldız sırası gelir, skorunu arkadaşlarınla karşılaştır. 👥 2 Kişide ekranın sol yarısı 1. oyuncunun, sağ yarısı 2. oyuncunun: üst kısma dokun = dışa, alt kısma = içe. 🔁 Sırayla modunda herkes aynı parkurda bir el oynar.</p>
   <p style="font-size:14px">⏱️ Zamana Karşı: 60 saniye, çarpınca ölmezsin ama −5 puan. 💀 Hardcore: her şey %35 hızlı ama puanlar 2 katı. 🧘 Zen: hiç düşman yok, rahatla (✦ kazandırmaz).</p>
-  <p style="font-size:14px"><b style="color:#9be7ff">Yeni:</b> ☄️ Kuyruklu yıldız (Sv. 4+) kırmızı çizgiyle uyarır · 🪨 Asteroit kuşağı (Sv. 5+) halkanın bir kısmını kapatır · 🪐 Sv. 10'da 4. halka açılır · D Zaman Dondur gücü · göktaşını sıyırırsan <b>Kıl Payı +2</b> · her x10 komboda <b>Çılgınlık</b> (2x puan) · rekor koşun 👻 hayalet olarak seninle uçar · 💣 Yörünge mayını (Sv. 6+) birkaç saniye sonra patlar, yakınından uzaklaş · ✨ Takımyıldız: çizgiyle bağlı 5 yıldızın hepsini toplarsan +10 · <b style="color:#c6ff5c">mi</b> Mini gücü: 6 sn küçülürsün · 🎡 Menüdeki Şans Çarkı'nı günde bir kez çevir · 🔑 Tek kişilik oyun sonunda çıkan parkur kodunu arkadaşına at, aynı parkurda yarışın.</p>
+  <p style="font-size:14px"><b style="color:#9be7ff">Yeni:</b> ☄️ Kuyruklu yıldız (Sv. 4+) kırmızı çizgiyle uyarır · 🪨 Asteroit kuşağı (Sv. 5+) halkanın bir kısmını kapatır · 🪐 Sv. 10'da 4. halka açılır · D Zaman Dondur gücü · göktaşını sıyırırsan <b>Kıl Payı +2</b> · her x10 komboda <b>Çılgınlık</b> (2x puan) · rekor koşun 👻 hayalet olarak seninle uçar · 💣 Yörünge mayını (Sv. 6+) birkaç saniye sonra patlar, yakınından uzaklaş · ✨ Takımyıldız: çizgiyle bağlı 5 yıldızın hepsini toplarsan +10 · <b style="color:#c6ff5c">mi</b> Mini gücü: 6 sn küçülürsün · 🎡 Menüdeki Şans Çarkı'nı günde bir kez çevir · 🔑 Tek kişilik oyun sonunda çıkan parkur kodunu arkadaşına at, aynı parkurda yarışın · 🐉 Her ikinci boss <b>Kuyruklu Ejder</b>: dönen sarmal ateş açar · 🔄 <b>Ters Dünya</b>: kontroller ters, yönün arada kendiliğinden döner · 👹 <b>Boss Akını</b>: boss üstüne boss · 🎼 Ayarlar'dan müzik temasını değiştir.</p>
   <p class="small">Adil olsun diye meydan okuma, 2 kişi ve sırayla modlarında mağaza yükseltmeleri kapalıdır (yıldız görünümleri açık).</p>
   <button class="ghost back">← Geri</button>
 </div>
@@ -428,6 +430,7 @@
   <h2>AYARLAR</h2>
   <div class="setlist">
     <div class="setrow">🎵 Müzik <button class="tgl" data-k="music"></button></div>
+    <div class="setrow">🎼 Müzik teması <button class="ghost" id="mpackBtn" style="padding:6px 14px;font-size:13px;margin-left:10px">Klasik</button></div>
     <div class="setrow">🔔 Ses efektleri <button class="tgl" data-k="sfx"></button></div>
     <div class="setrow">📳 Titreşim <button class="tgl" data-k="vib"></button></div>
     <div class="setrow">👆 Kaydırma kontrolü <small style="opacity:.5;font-weight:400">yukarı=dış</small> <button class="tgl" data-k="swipe"></button></div>
@@ -960,6 +963,14 @@
   // A-minor loop: Am – F – C – G, 16 steps per bar. Tempo follows the game.
   const ROOTS = [45, 41, 48, 43], CHORDS = [[0, 3, 7], [0, 4, 7], [0, 4, 7], [0, 4, 7]];
   const ARP = [0, 1, 2, 1, 2, 0, 1, 2];
+  // müzik temaları (Ayarlar > Müzik teması)
+  const MPACKS = [
+    { name: 'Klasik', roots: ROOTS, chords: CHORDS, lead: 'square', bass: 'triangle', bpm: 0, drums: true },
+    { name: 'Synthwave', roots: [45, 43, 41, 40], chords: [[0, 3, 7], [0, 4, 7], [0, 4, 7], [0, 4, 7]], lead: 'sawtooth', bass: 'sawtooth', bpm: 8, drums: true },
+    { name: 'Sakin', roots: [48, 45, 41, 43], chords: [[0, 4, 7], [0, 3, 7], [0, 4, 7], [0, 4, 7]], lead: 'sine', bass: 'sine', bpm: -18, drums: false },
+    { name: 'Epik', roots: [38, 41, 36, 43], chords: [[0, 3, 7], [0, 4, 7], [0, 4, 7], [0, 4, 7]], lead: 'triangle', bass: 'sawtooth', bpm: 4, drums: true }
+  ];
+  const MP = () => MPACKS[settings.mpack || 0] || MPACKS[0];
   let nextNote = 0, mStep = 0;
   const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
   function tone(time, freq, dur, type, vol) {
@@ -983,9 +994,9 @@
     s.connect(f); f.connect(g); g.connect(musG); s.start(time); s.stop(time + 0.05);
   }
   function musicBpm() {
-    if (state !== 'play') return 84;
+    if (state !== 'play') return 84 + MP().bpm * 0.5;
     if (mode === 'zen') return 76;
-    return Math.min(150, 104 + (level - 1) * 5) + (boss ? 10 : 0) + (players.length && players[0].fever > 0 ? 24 : 0);
+    return Math.min(150, 104 + (level - 1) * 5) + (boss ? 10 : 0) + (players.length && players[0].fever > 0 ? 24 : 0) + MP().bpm;
   }
   function musicTick() {
     if (!actx) return;
@@ -993,15 +1004,16 @@
     const playing = state === 'play' && mode !== 'zen';
     while (nextNote < actx.currentTime + 0.15) {
       const s = mStep % 64, bar = Math.floor(s / 16), b = s % 16;
-      let root = ROOTS[bar], ch = CHORDS[bar];
+      const MPk = MP();
+      let root = MPk.roots[bar], ch = MPk.chords[bar];
       if (boss) { root -= 1; ch = [0, 3, 6]; } // tense, diminished while the boss is up
-      if (b % 8 === 0 || b === 6 || (playing && b === 14)) tone(nextNote, mtof(root), 0.28, 'triangle', 0.11);
+      if (b % 8 === 0 || b === 6 || (playing && b === 14)) tone(nextNote, mtof(root), 0.28, MPk.bass, MPk.bass === 'sawtooth' ? 0.045 : 0.11);
       if (b % 2 === 0) {
         const iv = ch[ARP[(b / 2) % 8]] + (b >= 8 ? 24 : 12);
-        tone(nextNote, mtof(root + 12 + iv), 0.16, playing ? 'square' : 'sine', playing ? 0.018 : 0.03);
+        tone(nextNote, mtof(root + 12 + iv), 0.16, playing ? MPk.lead : 'sine', playing ? (MPk.lead === 'sawtooth' ? 0.012 : MPk.lead === 'sine' ? 0.035 : 0.018) : 0.03);
       }
       if (b === 0 && !playing) tone(nextNote, mtof(root + 24 + ch[2]), 1.6, 'sine', 0.02);
-      if (playing) {
+      if (playing && MPk.drums) {
         if (b % 4 === 0) kick(nextNote);
         if (b % 4 === 2) hat(nextNote, 0.05);
         else if (b % 2 === 1 && level >= 3) hat(nextNote, 0.02);
@@ -1068,7 +1080,10 @@
     { id: 'fever', ic: '🌈', name: 'Çılgınlık!', ds: 'Çılgınlık moduna gir', rw: 40 },
     { id: 'ring4', ic: '🪐', name: 'Dördüncü Yörünge', ds: '4. halkayı aç', rw: 80 },
     { id: 'weekly', ic: '📆', name: 'Haftanın Yıldızı', ds: 'Haftalık meydan okumayı tamamla', rw: 100 },
-    { id: 'cons', ic: '✨', name: 'Yıldız Haritası', ds: 'Bir takımyıldızı tamamla', rw: 50 }
+    { id: 'cons', ic: '✨', name: 'Yıldız Haritası', ds: 'Bir takımyıldızı tamamla', rw: 50 },
+    { id: 'dragon', ic: '🐉', name: 'Ejder Avcısı', ds: 'Kuyruklu Ejder\'i yen', rw: 150 },
+    { id: 'mirror30', ic: '🔄', name: 'Ters Köşe', ds: 'Ters Dünya\'da 30 puan', rw: 80 },
+    { id: 'rush3', ic: '👹', name: 'Boss Dur Durak Bilmez', ds: 'Boss Akını\'nda 3 boss yen', rw: 150 }
   ];
   let achieved = store.get('ach', {});
   function unlock(id) {
@@ -1123,6 +1138,7 @@
   let mines = [], mineT = 10, cons = null, consT = 20, recCel = false;
   // ölüm anı yavaş çekim + parkur kodu (tek kişilik oyunlar tohumlu, kodla tekrar oynanabilir)
   let deathZoom = 0, deathAt = null, fixedSeed = null, runSeed = null;
+  let rushT = 2, mirrorT = 6, mirrorWarn = false; // Boss Akını / Ters Dünya
   const seedCode = s => 'YRG-' + s.toString(36).toUpperCase();
   function parseCode(str) {
     const s = String(str || '').toUpperCase().trim().replace(/^YRG-?/, '').replace(/[^0-9A-Z]/g, '');
@@ -1171,6 +1187,7 @@
     NR = 3; setRings();
     freezeT = 0; belts = []; comets = []; beltT = 12; cometT = 9; resumeCD = 0;
     mines = []; mineT = 10; cons = null; consT = 20; recCel = false; deathZoom = 0;
+    rushT = 2; mirrorT = 6; mirrorWarn = false;
     ghostRec = []; ghostT = 0; ghostPassed = false;
     if (mode === 'duo') {
       const s1 = curSkin();
@@ -1180,7 +1197,7 @@
     stars = []; rocks = []; hunters = []; flares = []; powerups = []; parts = []; floaters = [];
     gt = 0; spawnT = 1.6; starT = 0.3; hunterT = 14; flareT = 6; powerT = 8;
     shake = 0; level = 1; slowT = 0; event = null;
-    boss = null; bossNext = 5; bossKills = 0; beams = [];
+    boss = null; bossNext = mode === 'rush' ? 999 : 5; bossKills = 0; beams = [];
     lasers = []; missiles = []; holes = []; laserT = 8; missileT = 6; holeT = 10; dodged = 0;
     campBase = 0; campBossSpawned = false;
     if (mode === 'camp') { const d = CAMP[campIdx]; level = d.diff; campBase = (d.diff - 1) * 15; bossNext = 999; }
@@ -1212,6 +1229,7 @@
     else if (mode === 'camp') $('hudR').textContent = '★'.repeat(campProg[campIdx] || 0) || '–';
     else if (mode === 'zen') $('hudR').textContent = '🧘';
     else if (mode === 'weekly') $('hudR').textContent = wkData().done ? '✓' : wkRule().target;
+    else if (mode === 'mirror' || mode === 'rush') $('hudR').textContent = store.get(mode + 'Best', 0);
     else if (mode === 'daily') $('hudR').textContent = daily.key === todayKey() ? daily.best : 0;
     else if (mode === 'turns') $('hudR').textContent = turns.results.length ? Math.max(...turns.results.map(r => r.score)) : '–';
     else $('hudR').textContent = best;
@@ -1430,12 +1448,14 @@
   // ---------- boss ----------
   function spawnBoss(tier = bossKills) {
     const hp = 10 + tier * 5;
-    boss = { hp, max: hp, fireT: 2.5, aimT: 4.5, w: 0.4, rot: 0, flash: 0, charge: 0, n: tier };
-    rocks = rocks.filter(r => r.out); hunters = []; event = null; lasers = []; missiles = []; holes = [];
+    // tek sıralı boss'lar Kara Güneş, çift sıralılar Kuyruklu Ejder (sarmal ateş)
+    const dragon = tier % 2 === 1;
+    boss = { hp, max: hp, fireT: 2.5, aimT: 4.5, w: dragon ? 0.9 : 0.4, rot: 0, flash: 0, charge: 0, n: tier, kind: dragon ? 'dragon' : 'sun', spT: 1.5, burst: 0 };
+    rocks = rocks.filter(r => r.out); hunters = []; event = null; lasers = []; missiles = []; holes = []; mines = []; belts = []; comets = [];
     $('bossBar').style.display = 'flex';
-    $('bossName').textContent = tier ? `KARA GÜNEŞ · ${tier + 1}` : 'KARA GÜNEŞ';
+    $('bossName').textContent = (dragon ? 'KUYRUKLU EJDER' : 'KARA GÜNEŞ') + (tier > 1 ? ` · ${Math.floor(tier / 2) + 1}` : '');
     $('bossHp').style.width = '100%';
-    banner('KARA GÜNEŞ UYANDI<small>Yıldız topla, ona ışın gönder!</small>', '#ff5cf0', 2);
+    banner(dragon ? 'KUYRUKLU EJDER GELDİ<small>Sarmal ateşine dikkat! Yıldız topla, vur!</small>' : 'KARA GÜNEŞ UYANDI<small>Yıldız topla, ona ışın gönder!</small>', dragon ? '#5cff9d' : '#ff5cf0', 2);
     shake = 12; buzz(150);
     beep(70, 1.2, 'sawtooth', .08, -30);
   }
@@ -1452,7 +1472,10 @@
     if (boss.hp <= 0) {
       for (let i = 0; i < 4; i++) setTimeout(() => burst(cx + (Math.random() - .5) * U * .1, cy + (Math.random() - .5) * U * .1, ['#ff5cf0', '#ffd166', '#b98bff', '#fff'][i], 40, 320), i * 120);
       rocks = rocks.filter(r => !r.out);
+      const wasDragon = boss.kind === 'dragon';
       boss = null; bossKills++;
+      if (wasDragon && mode !== 'zen') unlock('dragon');
+      if (mode === 'rush' && bossKills >= 3) unlock('rush3');
       $('bossBar').style.display = 'none';
       for (const pl of alive()) pl.score += 20;
       updHud();
@@ -1465,6 +1488,17 @@
   function updateBoss(edt) {
     boss.rot += edt * boss.w; boss.flash = Math.max(0, boss.flash - edt);
     const n = boss.n;
+    if (boss.kind === 'dragon') {
+      // ejder: dönen çift kollu sarmal ateş, ara ara nefes alır
+      boss.spT -= edt; boss.fireT = 99; boss.charge = boss.spT > 0.6 && boss.burst === 0 ? Math.max(0, 1 - (boss.spT - 0.6) / 1.6) : 0;
+      if (boss.spT <= 0) {
+        const a = boss.rot * 2.4, sp = U * (0.15 + n * 0.008);
+        bossShot(a, sp); bossShot(a + Math.PI, sp);
+        boss.burst++;
+        if (boss.burst >= 22) { boss.burst = 0; boss.spT = 2.2; } else boss.spT = Math.max(0.1, 0.17 - n * 0.008);
+        if (boss.burst % 4 === 1) beep(260, .05, 'triangle', .02);
+      }
+    }
     boss.fireT -= edt;
     if (boss.fireT < 0.6) boss.charge = 1 - boss.fireT / 0.6;
     if (boss.fireT <= 0) {
@@ -1625,6 +1659,17 @@
       } else banner(`SEVİYE ${level}`, '#b98bff');
     }
     if (boss && freezeT <= 0) updateBoss(dt * slowmo);
+    // Boss Akını: boss yenilince 3 sn sonra yenisi gelir
+    if (mode === 'rush' && !boss) { rushT -= dt; if (rushT <= 0) { spawnBoss(bossKills); rushT = 3; } }
+    // Ters Dünya: yön arada bir kendiliğinden döner (1 sn önce uyarır)
+    if (mode === 'mirror') {
+      mirrorT -= dt;
+      if (mirrorT < 1 && !mirrorWarn && P0().alive) { mirrorWarn = true; const q = ppos(P0()); floatText(q.x, q.y - 24, '⟲ YÖN DÖNÜYOR!', '#7cf3ff'); beep(500, .1, 'square', .03); }
+      if (mirrorT <= 0) {
+        for (const p of alive()) { p.dir *= -1; const q = ppos(p); burst(q.x, q.y, '#7cf3ff', 12, 120); }
+        mirrorT = 5 + R.rock() * 3; mirrorWarn = false; beep(300, .15, 'sine', .05, 300);
+      }
+    }
     for (let i = beams.length - 1; i >= 0; i--) { beams[i].life -= dt * (beams[i].ring ? 1.6 : 3); if (beams[i].life <= 0) beams.splice(i, 1); }
     if (mode !== 'zen' && mode !== 'duo' && gt >= 180) unlock('surv');
 
@@ -2243,6 +2288,15 @@
           head: `GÜNÜN MEYDAN OKUMASI · ${todayStr()}`, big: String(daily.best), sub: 'Aynı parkurda geçebilir misin?', skins: [p.skin],
           text: `Yörünge · Günün Meydan Okuması (${todayStr()}): ${daily.best} puan yaptım! Aynı parkurda beni geçebilir misin? 🚀`
         };
+      } else if (mode === 'mirror' || mode === 'rush') {
+        const key = mode + 'Best', prev = store.get(key, 0);
+        title = mode === 'mirror' ? 'TERS DÜNYA 🔄' : 'BOSS AKINI 👹';
+        if (p.score > prev) { store.set(key, p.score); msg = 'Yeni rekor! 🚀'; } else msg = `Rekorun: ${prev}`;
+        if (mode === 'mirror' && p.score >= 30) unlock('mirror30');
+        lastShare = {
+          head: title, big: String(p.score), sub: p.score > prev ? 'Yeni rekor!' : `Rekorum: ${prev}`, skins: [p.skin],
+          text: `Yörünge ${title} modunda ${p.score} puan yaptım! Sen kaç yaparsın?`
+        };
       } else if (mode === 'weekly') {
         const w = wkData(), WR = wkRule();
         title = `HAFTALIK · ${WR.em} ${WR.name.toUpperCase()}`;
@@ -2270,7 +2324,7 @@
           text: `Yörünge'de ${p.score} puan yaptım! Geç beni 🚀`
         };
       }
-      if (p.score > best && mode !== 'time' && mode !== 'hard' && mode !== 'camp' && mode !== 'weekly') best = p.score;
+      if (p.score > best && mode !== 'time' && mode !== 'hard' && mode !== 'camp' && mode !== 'weekly' && mode !== 'mirror' && mode !== 'rush') best = p.score;
       const brk = (mode !== 'camp' && mode !== 'weekly') ? addBoard(mode, p.score) : 0;
       boardHi = brk ? board[mode][brk - 1].d : null;
       if (brk === 1 && (board[mode] || []).length >= 5) unlock('board1');
@@ -2496,7 +2550,7 @@
     ctx.fillRect(-20, -20, W + 40, H + 40);
     drawDeco(TH);
 
-    const nc = boss ? [150, 30, 170] : (mode === 'zen' ? [40, 120, 160] : (TH.neb || NEBULA[((level || 1) - 1) % NEBULA.length]));
+    const nc = boss ? (boss.kind === 'dragon' ? [30, 150, 90] : [150, 30, 170]) : (mode === 'zen' ? [40, 120, 160] : (TH.neb || NEBULA[((level || 1) - 1) % NEBULA.length]));
     const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, U * 0.75);
     g.addColorStop(0, `rgba(${nc[0]},${nc[1]},${nc[2]},0.2)`);
     g.addColorStop(0.5, `rgba(${nc[0] / 2},${nc[1] / 2},${nc[2]},0.08)`);
@@ -2557,30 +2611,31 @@
     const flaring = flares.some(f => f.warn <= 0);
     const pulse = 1 + Math.sin(t * 2) * 0.04 + (flaring ? 0.15 + Math.sin(t * 25) * 0.05 : 0);
     if (boss) {
+      const BR = boss.kind === 'dragon' ? '92,255,157' : '255,92,240', BC = `rgb(${BR})`;
       const bp = 1 + Math.sin(t * 3) * 0.05 + boss.charge * 0.25;
       const cor = ctx.createRadialGradient(cx, cy, sunR * 0.6, cx, cy, sunR * 3 * bp);
-      cor.addColorStop(0, `rgba(255,92,240,${0.55 + boss.charge * 0.4})`);
+      cor.addColorStop(0, `rgba(${BR},${0.55 + boss.charge * 0.4})`);
       cor.addColorStop(0.4, 'rgba(120,40,200,0.3)');
       cor.addColorStop(1, 'rgba(60,0,90,0)');
       ctx.fillStyle = cor; ctx.beginPath(); ctx.arc(cx, cy, sunR * 3 * bp, 0, 6.283); ctx.fill();
       // spikes
       ctx.save(); ctx.translate(cx, cy); ctx.rotate(boss.rot);
-      ctx.fillStyle = 'rgba(255,92,240,.55)';
+      ctx.fillStyle = `rgba(${BR},.55)`;
       for (let i = 0; i < 8; i++) {
         ctx.rotate(Math.PI / 4);
         ctx.beginPath(); ctx.moveTo(-sunR * 0.18, -sunR * 0.9); ctx.lineTo(0, -sunR * (1.45 + Math.sin(t * 6 + i) * 0.12 + boss.charge * 0.3)); ctx.lineTo(sunR * 0.18, -sunR * 0.9); ctx.fill();
       }
       ctx.restore();
       ctx.fillStyle = boss.flash > 0 ? '#ffffff' : '#120818';
-      ctx.shadowColor = '#ff5cf0'; ctx.shadowBlur = 30;
+      ctx.shadowColor = BC; ctx.shadowBlur = 30;
       ctx.beginPath(); ctx.arc(cx, cy, sunR * bp, 0, 6.283); ctx.fill();
       ctx.shadowBlur = 0;
-      ctx.strokeStyle = '#ff5cf0'; ctx.lineWidth = 3;
+      ctx.strokeStyle = BC; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.arc(cx, cy, sunR * bp, 0, 6.283); ctx.stroke();
       // eye
       const tp = players.find(p => p.alive);
       const ea = tp ? tp.a : t;
-      ctx.fillStyle = '#ff5cf0';
+      ctx.fillStyle = BC;
       ctx.beginPath(); ctx.ellipse(cx + Math.cos(ea) * sunR * 0.35, cy + Math.sin(ea) * sunR * 0.35, sunR * 0.22, sunR * 0.12 + boss.charge * sunR * 0.1, ea, 0, 6.283); ctx.fill();
     } else drawSun(ctx, cx, cy, sunR, curSun(), t, flaring, pulse);
     // beams (boss hits) and bomb shockwaves
@@ -2961,6 +3016,9 @@
     const av = drAvail();
     $('drBadge').style.display = av ? 'flex' : 'none';
     $('drInfo').textContent = av ? `${drNext()}. gün ödülü hazır!` : `Seri: ${dr.streak} gün 🔥`;
+    const mbst = store.get('mirrorBest', 0), rbst = store.get('rushBest', 0);
+    $('mirrorInfo').textContent = mbst ? `Rekorun: ${mbst}` : 'Kontroller ters, yön döner';
+    $('rushInfo').textContent = rbst ? `Rekorun: ${rbst}` : 'Sadece boss savaşları';
     const wav = wheelAvail();
     $('menuDot').style.display = (av || wav) ? 'block' : 'none';
     $('wheelBadge').style.display = wav ? 'flex' : 'none';
@@ -2973,11 +3031,12 @@
       const cheap = SKINS.filter(s => !s.chest && !(owned || []).includes(s.id)).sort((a, b) => a.price - b.price)[0];
       const streak = (dr.last === dayIdx() || dr.last === dayIdx() - 1) ? dr.streak : 0;
       try {
-        AB.syncNotif(JSON.stringify({ streak, best, missions: claimable(), coins, shopName: cheap ? cheap.name : '', shopPrice: cheap ? cheap.price : 0, wkName: WR.name, wkEm: WR.em, wkDone: wd.done }));
+        AB.syncNotif(JSON.stringify({ drLast: dr.last, streak, best, missions: claimable(), coins, shopName: cheap ? cheap.name : '', shopPrice: cheap ? cheap.price : 0, wkName: WR.name, wkEm: WR.em, wkDone: wd.done }));
       } catch (e) {}
     }
   }
   function renderSettings() {
+    $('mpackBtn').textContent = MP().name;
     document.querySelectorAll('.tgl').forEach(b => b.classList.toggle('on', !!settings[b.dataset.k]));
   }
 
@@ -3366,6 +3425,8 @@
     if (mode === 'time') banner('60 SANİYE<small>Çarpınca −5 puan</small>', '#7cf3ff');
     if (mode === 'hard') banner('HARDCORE 💀<small>%35 hızlı · 2x puan</small>', '#ff5c7a');
     if (mode === 'zen') banner('ZEN<small>Düşman yok · rahatla</small>', '#5ce1ff');
+    if (mode === 'mirror') banner('TERS DÜNYA 🔄<small>Kontroller ters · yön kendiliğinden döner</small>', '#7cf3ff', 2);
+    if (mode === 'rush') banner('BOSS AKINI 👹<small>Boss üstüne boss! Yıldız topla, vur!</small>', '#ff5cf0', 1.5);
     if (mode === 'weekly') { const WR = wkRule(); banner(`${WR.em} ${WR.name.toUpperCase()}<small>${WR.ds} · hedef ${WR.target}</small>`, '#ffd166', 2.5); }
     beep(440, .15, 'triangle', .06, 440);
   }
@@ -3421,8 +3482,17 @@
   on('timeBtn', () => startMode('time'));
   on('zenBtn', () => startMode('zen'));
   on('hardBtn', () => startMode('hard'));
+  on('mirrorBtn', () => startMode('mirror'));
+  on('rushBtn', () => startMode('rush'));
   on('weeklyBtn', () => startMode('weekly'));
   on('wheelBtn', () => openSub('wheelP', 'menu'));
+  on('mpackBtn', () => { settings.mpack = ((settings.mpack || 0) + 1) % MPACKS.length; store.set('settings', settings); renderSettings(); chime(); });
+  // Android uygulama kısayolları (ikona uzun bas)
+  window.yorungeShortcut = m => {
+    if (state === 'play' || state === 'pause') return;
+    if (m === 'wheel') { show('menu'); openSub('wheelP', 'menu'); return; }
+    if (['daily', 'weekly', 'solo'].includes(m)) startMode(m);
+  };
   on('wheelSpin', spinWheel);
   on('codeBtn', () => { $('codeErr').textContent = ''; $('codeIn').value = ''; openSub('codeP', 'menu'); });
   function playCode() {
@@ -3539,8 +3609,9 @@
       if (k === 'ArrowDown') move(players[1], -1);
       return;
     }
-    if (k === 'ArrowLeft' || k === 'ArrowDown' || k === 'a' || k === 'A') move(P0(), -1);
-    if (k === 'ArrowRight' || k === 'ArrowUp' || k === 'd' || k === 'D') move(P0(), 1);
+    const ms = mode === 'mirror' ? -1 : 1;
+    if (k === 'ArrowLeft' || k === 'ArrowDown' || k === 'a' || k === 'A') move(P0(), -ms);
+    if (k === 'ArrowRight' || k === 'ArrowUp' || k === 'd' || k === 'D') move(P0(), ms);
     if (k === ' ') reverse(P0());
   });
 
@@ -3551,12 +3622,13 @@
       return;
     }
     const left = x < W / 2;
-    move(P0(), (left !== !!settings.lefty) ? -1 : 1);
+    const inv = !!settings.lefty !== (mode === 'mirror'); // Ters Dünya'da kontroller ters
+    move(P0(), (left !== inv) ? -1 : 1);
   }
   function showZones(on) {
-    const lefty = !!settings.lefty;
-    $('zL').firstChild.textContent = lefty ? '← DIŞ' : '← İÇ';
-    $('zR').firstChild.textContent = lefty ? 'İÇ →' : 'DIŞ →';
+    const lefty = !!settings.lefty, inv = lefty !== (mode === 'mirror');
+    $('zL').firstChild.textContent = inv ? '← DIŞ' : '← İÇ';
+    $('zR').firstChild.textContent = inv ? 'İÇ →' : 'DIŞ →';
     $('zones').style.display = on ? 'block' : 'none';
     $('revBtn').classList.toggle('lefty', lefty);
     $('powers').classList.toggle('lefty', lefty);
@@ -3576,7 +3648,7 @@
     if (Math.abs(dy) > 28) {
       s0.done = true;
       const p = mode === 'duo' ? (s0.x < W / 2 ? players[0] : players[1]) : P0();
-      move(p, dy < 0 ? 1 : -1);
+      move(p, ((dy < 0) !== (mode === 'mirror')) ? 1 : -1);
     }
   });
   const endTouch = e => {
