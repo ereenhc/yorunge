@@ -91,10 +91,11 @@
   .mode{background:rgba(20,22,45,.75);border:1px solid #2e3360;border-radius:16px;padding:14px 10px;cursor:pointer;color:#e8ecff;font:inherit;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .15s,border-color .15s}
   .mode:hover{transform:translateY(-2px);border-color:#7cf3ff}
   .mode.wide{grid-column:1/-1;flex-direction:row;justify-content:center;gap:12px;text-align:left;border-color:rgba(255,209,102,.55);background:linear-gradient(90deg,rgba(255,209,102,.12),rgba(20,22,45,.75))}
+  .mode.lastw{grid-column:1/-1;flex-direction:row;justify-content:center;gap:12px;text-align:left}
   .mode .em{font-size:24px}
   .mode b{font-size:14px}
   .mode span{font-size:11px;opacity:.6;line-height:1.3}
-  @media (max-width:460px){.row>button.main{padding:13px 20px;font-size:15px;letter-spacing:.06em}.modes{grid-template-columns:1fr 1fr;gap:8px}.mode{padding:10px 6px}.mode .em{font-size:20px}.mode b{font-size:13px}h1{font-size:44px}.mode.lastw{grid-column:1/-1;flex-direction:row;justify-content:center;gap:12px;text-align:left;padding:8px 10px}}
+  @media (max-width:460px){.row>button.main{padding:13px 20px;font-size:15px;letter-spacing:.06em}.modes{grid-template-columns:1fr 1fr;gap:8px}.mode{padding:10px 6px}.mode .em{font-size:20px}.mode b{font-size:13px}h1{font-size:44px}.mode.lastw{grid-column:auto;flex-direction:column;text-align:center;gap:4px}}
 
   /* shop */
   .tabs{display:flex;gap:6px;background:rgba(20,22,45,.7);border:1px solid #2e3360;border-radius:999px;padding:4px}
@@ -172,6 +173,16 @@
   .day.got{opacity:.4}
   .day.now{border-color:#ffd166;box-shadow:0 0 18px rgba(255,209,102,.35);transform:scale(1.06)}
   .day.big b{font-size:16px}
+  /* sezon kartı */
+  .sbar{width:min(520px,94vw);height:10px;border-radius:6px;background:#1a1d36;overflow:hidden;margin:4px 0 10px}
+  .sbar i{display:block;height:100%;background:linear-gradient(90deg,#ff9f43,#ffd166);border-radius:6px}
+  .stiers{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;width:min(520px,94vw)}
+  .stier{font:inherit;color:#e8ecff;background:rgba(20,22,45,.75);border:1px solid #2e3360;border-radius:12px;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;cursor:pointer}
+  .stier b{font-size:13px;color:#ffd166}
+  .stier.lock{opacity:.35}
+  .stier.got{opacity:.45}
+  .stier.can{border-color:#ffd166;box-shadow:0 0 14px rgba(255,209,102,.4);animation:pop 1.2s infinite}
+  .stier.big{border-color:#b98bff}
   /* achievements */
   .alist{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;width:min(620px,92vw)}
   .ach{display:flex;align-items:center;gap:10px;background:rgba(20,22,45,.75);border:1px solid #2e3360;border-radius:12px;padding:10px 12px;text-align:left}
@@ -305,12 +316,13 @@
   <nav id="drawer">
     <div class="dTitle">MENÜ</div>
     <button class="dItem" id="dailyRwBtn"><span class="em">🎁</span><span>Günlük Ödül<small id="drInfo">Her gün ✦ kazan</small></span><span class="badge" id="drBadge" style="display:none">!</span></button>
+    <button class="dItem" id="seasonBtn"><span class="em">🎟️</span><span>Sezon Kartı<small id="seasonInfo">30 kademe ödül</small></span><span class="badge" id="seasonBadge" style="display:none">!</span></button>
     <button class="dItem" id="achBtn"><span class="em">🏆</span><span>Başarımlar</span></button>
     <button class="dItem" id="boardBtn"><span class="em">🏅</span><span>Skorlar</span></button>
     <button class="dItem" id="statsBtn"><span class="em">📊</span><span>İstatistikler</span></button>
     <button class="dItem" id="setBtn"><span class="em">⚙️</span><span>Ayarlar</span></button>
     <button class="dItem" id="wheelBtn"><span class="em">🎡</span><span>Şans Çarkı<small id="wheelInfo">Günde 1 kez çevir</small></span><span class="badge" id="wheelBadge" style="display:none">!</span></button>
-    <button class="dItem" id="codeBtn"><span class="em">🔑</span><span>Parkur Kodu Gir<small>Arkadaşının parkurunu oyna</small></span></button>
+    <button class="dItem" id="codeBtn"><span class="em">🔑</span><span>Meydan Okuma Kodu<small>Arkadaşının skorunu geç</small></span></button>
     <button class="dItem" id="helpBtn"><span class="em">❔</span><span>Nasıl Oynanır</span></button>
   </nav>
   <h1>YÖRÜNGE</h1>
@@ -332,7 +344,8 @@
     <button class="mode" id="hardBtn"><div class="em">💀</div><div><b>Hardcore</b><br><span id="hardInfo">Her şey hızlı · 2x puan</span></div></button>
     <button class="mode" id="mirrorBtn"><div class="em">🔄</div><div><b>Ters Dünya</b><br><span id="mirrorInfo">Kontroller ters, yön döner</span></div></button>
     <button class="mode" id="rushBtn"><div class="em">👹</div><div><b>Boss Akını</b><br><span id="rushInfo">Sadece boss savaşları</span></div></button>
-    <button class="mode lastw" id="darkBtn"><div class="em">🌑</div><div><b>Karanlık Uzay</b><br><span id="darkInfo">Işık sadece senin etrafında</span></div></button>
+    <button class="mode" id="darkBtn"><div class="em">🌑</div><div><b>Karanlık Uzay</b><br><span id="darkInfo">Işık sadece senin etrafında</span></div></button>
+    <button class="mode lastw" id="chaosBtn"><div class="em">🎲</div><div><b>Kaos</b><br><span id="chaosInfo">Her 15 sn kural değişir</span></div></button>
   </div>
   <div class="row">
     <button class="ghost" id="shopBtn">🛒 Mağaza</button>
@@ -454,6 +467,15 @@
 </div>
 
 <!-- DAILY REWARD -->
+<div class="panel hidden" id="seasonP">
+  <h2>🎟️ SEZON KARTI</h2>
+  <p id="seasonTxt">Oynadıkça XP kazan, kademeleri aç, ödülleri topla!</p>
+  <div class="sbar"><i id="seasonFill"></i></div>
+  <div class="stiers" id="seasonGrid"></div>
+  <button class="main" id="seasonAll">HEPSİNİ AL</button>
+  <button class="ghost back">← Geri</button>
+</div>
+
 <div class="panel hidden" id="dailyRw">
   <h2>GÜNLÜK ÖDÜL</h2>
   <p id="drText">Her gün gir, seriyi bozma!</p>
@@ -521,9 +543,9 @@
 
 <!-- PARKUR KODU -->
 <div class="panel hidden" id="codeP">
-  <h2>PARKUR KODU</h2>
-  <p>Arkadaşının oyun sonunda paylaştığı kodu gir; aynı göktaşı ve yıldız sırasıyla oyna, skorlarınızı karşılaştırın.</p>
-  <div class="names"><input id="codeIn" maxlength="16" placeholder="YRG-XXXXXX" autocapitalize="characters" autocomplete="off" spellcheck="false"></div>
+  <h2>MEYDAN OKUMA KODU</h2>
+  <p>Arkadaşının oyun sonunda paylaştığı kodu gir. Aynı parkurda oynarsın, onun skoru hedefin olur. Geçebilecek misin?</p>
+  <div class="names"><input id="codeIn" maxlength="20" placeholder="YRG-XXXXXX-45" autocapitalize="characters" autocomplete="off" spellcheck="false"></div>
   <p class="small" id="codeErr" style="color:#ff5c7a;min-height:16px"></p>
   <button class="main" id="codeGo">OYNA</button>
   <button class="ghost back">← Geri</button>
@@ -659,7 +681,9 @@
     { id: 'plazma', name: 'Plazma', c: '#a8ff3e', core: '#f4ffe0', shape: 'star', trail: 'fire', chest: true, ds: 'Sandığa özel · yeşil alev' },
     { id: 'golge', name: 'Gölge', c: '#6b5cff', core: '#000000', shape: 'ring', trail: 'sparkle', chest: true, ds: 'Sandığa özel · karanlık ışık' },
     { id: 'altincag', name: 'Altın Çağ', c: '#ffcc33', core: '#fff3c4', shape: 'diamond', trail: 'sparkle', chest: true, ds: 'Sandığa özel · saf altın' },
-    { id: 'ejder', name: 'Kuyruklu Ejder', c: 'rainbow', core: '#ffe0f0', shape: 'diamond', trail: 'fire', chest: true, ds: 'Sandığa özel · efsanevi' }
+    { id: 'ejder', name: 'Kuyruklu Ejder', c: 'rainbow', core: '#ffe0f0', shape: 'diamond', trail: 'fire', chest: true, ds: 'Sandığa özel · efsanevi' },
+    { id: 'sezon1', name: 'Kozmik Bilet', c: '#ff9f43', core: '#fff0d8', shape: 'star', trail: 'sparkle', chest: true, season: true, ds: 'Sezon kartı · 15. kademe' },
+    { id: 'sezon2', name: 'Sezon Şampiyonu', c: 'rainbow', core: '#ffffff', shape: 'ring', trail: 'fire', chest: true, season: true, ds: 'Sezon kartı · 30. kademe' }
   );
   const skinOf = id => SKINS.find(s => s.id === id) || SKINS[0];
 
@@ -720,7 +744,7 @@
   const rankOf = lv => RANKS.filter(r => lv >= r[0]).pop()[1];
   function addXp(n) {
     if (n <= 0) return;
-    xp.cur += n;
+    xp.cur += n; addSeasonXp(n);
     while (xp.cur >= xpNeed(xp.lv)) {
       xp.cur -= xpNeed(xp.lv); xp.lv++;
       const rw = 20 + xp.lv * 10;
@@ -1085,7 +1109,10 @@
     { id: 'dragon', ic: '🐉', name: 'Ejder Avcısı', ds: 'Kuyruklu Ejder\'i yen', rw: 150 },
     { id: 'mirror30', ic: '🔄', name: 'Ters Köşe', ds: 'Ters Dünya\'da 30 puan', rw: 80 },
     { id: 'rush3', ic: '👹', name: 'Boss Dur Durak Bilmez', ds: 'Boss Akını\'nda 3 boss yen', rw: 150 },
-  { id: 'dark40', ic: '🌑', name: 'Karanlıkta Gören', ds: 'Karanlık Uzay\'da 40 puan', rw: 100 }
+  { id: 'dark40', ic: '🌑', name: 'Karanlıkta Gören', ds: 'Karanlık Uzay\'da 40 puan', rw: 100 },
+  { id: 'chaos50', ic: '🎲', name: 'Kaos Ustası', ds: 'Kaos modunda 50 puan', rw: 120 },
+  { id: 'friend', ic: '🤝', name: 'Kanka Avcısı', ds: 'Bir meydan okuma kodunda arkadaşını geç', rw: 80 },
+  { id: 'season10', ic: '🎟️', name: 'Sezonluk', ds: 'Sezon kartında 10. kademeye ulaş', rw: 100 }
   ];
   let achieved = store.get('ach', {});
   function unlock(id) {
@@ -1141,7 +1168,16 @@
   // ölüm anı yavaş çekim + parkur kodu (tek kişilik oyunlar tohumlu, kodla tekrar oynanabilir)
   let deathZoom = 0, deathAt = null, fixedSeed = null, runSeed = null;
   let rushT = 2, mirrorT = 6, mirrorWarn = false; // Boss Akını / Ters Dünya
-  const seedCode = s => 'YRG-' + s.toString(36).toUpperCase();
+  let chTarget = 0, chBeat = false; // meydan okuma kodu: arkadaşın skoru hedef
+  // meydan okuma kodu: YRG-<parkur>-<skor>  (eski YRG-<parkur> kodları da çalışır)
+  function parseChal(str) {
+    const parts = String(str || '').toUpperCase().trim().replace(/^YRG-?/, '').split(/[^0-9A-Z]+/).filter(Boolean);
+    if (!parts.length) return null;
+    const seed = parseCode(parts[0]);
+    if (seed == null) return null;
+    const sc = parts.length > 1 ? parseInt(parts[1], 10) : 0;
+    return { seed, target: (Number.isFinite(sc) && sc > 0 && sc < 100000) ? sc : 0 };
+  }  const seedCode = s => 'YRG-' + s.toString(36).toUpperCase();
   function parseCode(str) {
     const s = String(str || '').toUpperCase().trim().replace(/^YRG-?/, '').replace(/[^0-9A-Z]/g, '');
     if (!s) return null;
@@ -1161,7 +1197,81 @@
   const WK_REWARD = 300;
   const weekIdx = () => Math.floor((dayIdx() + 3) / 7); // hafta pazartesi başlar
   const wkRule = () => WK_RULES[weekIdx() % WK_RULES.length];
-  const isWk = id => mode === 'weekly' && wkRule().id === id;
+  // Kaos modu: haftalık kurallar + ters kontrol, 15 saniyede bir rastgele değişir
+  const CHAOS_RULES = WK_RULES.concat([{ id: 'ters', em: '🔄', name: 'Ters Kontrol', ds: 'Sağ ve sol yer değiştirdi' }, { id: 'sakin', em: '😌', name: 'Nefes Al', ds: 'Kural yok, normal oyun' }]);
+  let chaosRule = null, chaosT = 15;
+  const isWk = id => (mode === 'weekly' && wkRule().id === id) || (mode === 'chaos' && chaosRule === id);
+  const mirr = () => mode === 'mirror' || isWk('ters'); // kontroller ters mi?
+  function nextChaos(first) {
+    const pool = CHAOS_RULES.filter(r => r.id !== chaosRule);
+    const R0 = pool[Math.floor(Math.random() * pool.length)];
+    chaosRule = R0.id; chaosT = 15;
+    banner(`${first ? '🎲 KAOS · ' : ''}${R0.em} ${R0.name.toUpperCase()}<small>${R0.ds}</small>`, '#ff9f43', first ? 1.5 : 0);
+    if (!first) { beep(520, .1, 'square', .04); beep(780, .12, 'square', .04, 780); buzz(40); }
+    if ($('zones').style.display === 'block') showZones(true);
+  }
+
+  // ================= SEZON KARTI =================
+  // 30 günlük sezonlar, 30 kademe; oyunlardan kazanılan XP sezon kartına da yazılır
+  const SEASON_DAYS = 30, SEASON_TIERS = 30, SEASON_XP = 80;
+  const seasonIdx = () => Math.floor(dayIdx() / SEASON_DAYS);
+  let season = store.get('season', { s: -1, xp: 0, got: [] });
+  function seasonData() { if (season.s !== seasonIdx()) { season = { s: seasonIdx(), xp: 0, got: [] }; store.set('season', season); } return season; }
+  const seasonTier = () => Math.min(SEASON_TIERS, Math.floor(seasonData().xp / SEASON_XP));
+  const seasonLeft = () => SEASON_DAYS - (dayIdx() % SEASON_DAYS);
+  const SREW = t => t === 30 ? { sk: 'sezon2' } : t === 15 ? { sk: 'sezon1' } : { c: t % 5 === 0 ? 150 + t * 10 : 40 + t * 4 };
+  function seasonClaimable() { const sd = seasonData(), tr = seasonTier(); let n = 0; for (let t = 1; t <= tr; t++) if (!sd.got.includes(t)) n++; return n; }
+  function addSeasonXp(n) {
+    const sd = seasonData(), before = seasonTier();
+    sd.xp += n; store.set('season', sd);
+    const after = seasonTier();
+    if (after > before) setTimeout(() => toast(`🎟️ Sezon kartı: ${after}. kademe açıldı!`), 1500);
+    if (after >= 10) unlock('season10');
+  }
+  function giveSeason(t) {
+    const sd = seasonData();
+    if (t > seasonTier() || sd.got.includes(t)) return '';
+    sd.got.push(t);
+    const rw = SREW(t);
+    if (rw.sk) {
+      if (!owned.includes(rw.sk)) { owned.push(rw.sk); return `✨ ${skinOf(rw.sk).name}`; }
+      coins += 500; return '+500 ✦';
+    }
+    coins += rw.c; return `+${rw.c} ✦`;
+  }
+  function claimSeason(t) {
+    const got = giveSeason(t);
+    if (!got) { beep(120, .15, 'square', .04); return; }
+    store.set('season', season); saveAll(); chime(); buzz(40); toast(`🎟️ ${t}. kademe: ${got}`);
+    renderSeason(); refreshMeta();
+  }
+  function claimAllSeason() {
+    const tr = seasonTier(); let n = 0, sk = [];
+    const c0 = coins;
+    for (let t = 1; t <= tr; t++) { const g = giveSeason(t); if (g) { n++; if (g[0] === '✨') sk.push(g.slice(2)); } }
+    if (!n) { beep(120, .15, 'square', .04); toast('Alınacak ödül yok, biraz daha oyna!'); return; }
+    store.set('season', season); saveAll(); chime(); setTimeout(chime, 200); buzz(60);
+    toast(`🎟️ ${n} ödül: +${coins - c0} ✦${sk.length ? ' · ✨ ' + sk.join(', ') : ''}`);
+    renderSeason(); refreshMeta();
+  }
+  function renderSeason() {
+    const sd = seasonData(), tr = seasonTier();
+    const into = tr >= SEASON_TIERS ? SEASON_XP : sd.xp % SEASON_XP;
+    $('seasonTxt').innerHTML = tr >= SEASON_TIERS
+      ? `<b>Sezon tamamlandı! 🏆</b> Yeni sezon ${seasonLeft()} gün sonra.`
+      : `Kademe <b>${tr}</b> / ${SEASON_TIERS} · sonraki kademeye <b>${SEASON_XP - into} XP</b> · sezon bitimine ${seasonLeft()} gün`;
+    $('seasonFill').style.width = (into / SEASON_XP * 100) + '%';
+    const g = $('seasonGrid'); g.innerHTML = '';
+    for (let t = 1; t <= SEASON_TIERS; t++) {
+      const rw = SREW(t), got = sd.got.includes(t), can = !got && t <= tr;
+      const b = document.createElement('button');
+      b.className = 'stier' + (got ? ' got' : can ? ' can' : t > tr ? ' lock' : '') + (rw.sk || t % 5 === 0 ? ' big' : '');
+      b.innerHTML = `<b>${t}</b><span>${got ? '✓' : rw.sk ? '✨ Yıldız' : rw.c + ' ✦'}</span>`;
+      b.addEventListener('click', e => { e.stopPropagation(); if (can) claimSeason(t); else if (rw.sk) toast(`${t}. kademe: özel yıldız «${skinOf(rw.sk).name}»`); });
+      g.appendChild(b);
+    }
+    $('seasonAll').classList.toggle('no', !seasonClaimable());
+  }
   let weekly = store.get('weekly', { wk: 0, best: 0, done: false });
   function wkData() { if (weekly.wk !== weekIdx()) weekly = { wk: weekIdx(), best: 0, done: false }; return weekly; }
 
@@ -1189,7 +1299,7 @@
     NR = 3; setRings();
     freezeT = 0; belts = []; comets = []; beltT = 12; cometT = 9; resumeCD = 0;
     mines = []; mineT = 10; cons = null; consT = 20; recCel = false; deathZoom = 0;
-    rushT = 2; mirrorT = 6; mirrorWarn = false;
+    rushT = 2; mirrorT = 6; mirrorWarn = false; chaosRule = null; chaosT = 15; chBeat = false;
     ghostRec = []; ghostT = 0; ghostPassed = false;
     if (mode === 'duo') {
       const s1 = curSkin();
@@ -1231,7 +1341,8 @@
     else if (mode === 'camp') $('hudR').textContent = '★'.repeat(campProg[campIdx] || 0) || '–';
     else if (mode === 'zen') $('hudR').textContent = '🧘';
     else if (mode === 'weekly') $('hudR').textContent = wkData().done ? '✓' : wkRule().target;
-    else if (mode === 'mirror' || mode === 'rush' || mode === 'dark') $('hudR').textContent = store.get(mode + 'Best', 0);
+    else if (mode === 'mirror' || mode === 'rush' || mode === 'dark' || mode === 'chaos') $('hudR').textContent = store.get(mode + 'Best', 0);
+    else if (mode === 'solo' && chTarget) $('hudR').textContent = chBeat ? '🏆' : '🎯' + chTarget;
     else if (mode === 'daily') $('hudR').textContent = daily.key === todayKey() ? daily.best : 0;
     else if (mode === 'turns') $('hudR').textContent = turns.results.length ? Math.max(...turns.results.map(r => r.score)) : '–';
     else $('hudR').textContent = best;
@@ -1663,6 +1774,18 @@
     if (boss && freezeT <= 0) updateBoss(dt * slowmo);
     // Boss Akını: boss yenilince 3 sn sonra yenisi gelir
     if (mode === 'rush' && !boss) { rushT -= dt; if (rushT <= 0) { spawnBoss(bossKills); rushT = 3; } }
+    // Kaos: 15 saniyede bir kural değişir (son 3 sn uyarı)
+    if (mode === 'chaos' && P0().alive) {
+      const before = chaosT; chaosT -= dt;
+      if (before > 3 && chaosT <= 3) { const q = ppos(P0()); floatText(q.x, q.y - 24, '🎲 KURAL DEĞİŞİYOR!', '#ff9f43'); }
+      if (chaosT <= 0) nextChaos(false);
+    }
+    // Meydan okuma: arkadaşın skorunu geçince kutla
+    if (chTarget && !chBeat && mode === 'solo' && P0().score > chTarget) {
+      chBeat = true; banner('🏆 ARKADAŞINI GEÇTİN!<small>Hedef: ' + chTarget + '</small>', '#5cff9d', 0);
+      chime(); setTimeout(chime, 200); buzz(80); unlock('friend'); updHud();
+      const q = ppos(P0()); burst(q.x, q.y, '#5cff9d', 30, 220);
+    }
     // Ters Dünya: yön arada bir kendiliğinden döner (1 sn önce uyarır)
     if (mode === 'mirror') {
       mirrorT -= dt;
@@ -2290,9 +2413,10 @@
           head: `GÜNÜN MEYDAN OKUMASI · ${todayStr()}`, big: String(daily.best), sub: 'Aynı parkurda geçebilir misin?', skins: [p.skin],
           text: `Yörünge · Günün Meydan Okuması (${todayStr()}): ${daily.best} puan yaptım! Aynı parkurda beni geçebilir misin? 🚀`
         };
-      } else if (mode === 'mirror' || mode === 'rush' || mode === 'dark') {
+      } else if (mode === 'mirror' || mode === 'rush' || mode === 'dark' || mode === 'chaos') {
         const key = mode + 'Best', prev = store.get(key, 0);
-        title = mode === 'mirror' ? 'TERS DÜNYA 🔄' : mode === 'dark' ? 'KARANLIK UZAY 🌑' : 'BOSS AKINI 👹';
+        title = mode === 'mirror' ? 'TERS DÜNYA 🔄' : mode === 'dark' ? 'KARANLIK UZAY 🌑' : mode === 'chaos' ? 'KAOS 🎲' : 'BOSS AKINI 👹';
+        if (mode === 'chaos' && p.score >= 50) unlock('chaos50');
         if (p.score > prev) { store.set(key, p.score); msg = 'Yeni rekor! 🚀'; } else msg = `Rekorun: ${prev}`;
         if (mode === 'mirror' && p.score >= 30) unlock('mirror30');
         if (mode === 'dark' && p.score >= 40) unlock('dark40');
@@ -2327,7 +2451,7 @@
           text: `Yörünge'de ${p.score} puan yaptım! Geç beni 🚀`
         };
       }
-      if (p.score > best && mode !== 'time' && mode !== 'hard' && mode !== 'camp' && mode !== 'weekly' && mode !== 'mirror' && mode !== 'rush' && mode !== 'dark') best = p.score;
+      if (p.score > best && mode !== 'time' && mode !== 'hard' && mode !== 'camp' && mode !== 'weekly' && mode !== 'mirror' && mode !== 'rush' && mode !== 'dark' && mode !== 'chaos') best = p.score;
       const brk = (mode !== 'camp' && mode !== 'weekly') ? addBoard(mode, p.score) : 0;
       boardHi = brk ? board[mode][brk - 1].d : null;
       if (brk === 1 && (board[mode] || []).length >= 5) unlock('board1');
@@ -2345,8 +2469,13 @@
     const showCode = mode === 'solo' && runSeed != null;
     $('overCode').style.display = showCode ? '' : 'none';
     if (showCode) {
-      $('overCode').textContent = `🔑 Parkur kodu: ${seedCode(runSeed)} · arkadaşın aynı parkuru oynasın`;
-      if (lastShare) lastShare.text += ` 🔑 Parkur kodum: ${seedCode(runSeed)}`;
+      const chc = seedCode(runSeed) + (p.score > 0 ? '-' + p.score : '');
+      $('overCode').textContent = `🔑 Meydan okuma kodu: ${chc} · arkadaşın bu skoru geçmeye çalışsın`;
+      if (lastShare) lastShare.text += ` 🔑 Meydan okuma kodum: ${chc} (Menü → Meydan Okuma Kodu)`;
+      if (chTarget) {
+        msg = p.score > chTarget ? `🏆 Arkadaşını geçtin! (${p.score} > ${chTarget})` : `🎯 Arkadaşının skoru ${chTarget} · ${chTarget - p.score + 1} puan eksik kaldın`;
+        $('overMsg').textContent = msg;
+      }
     }
     saveAll();
     $('overTitle').textContent = title;
@@ -3022,10 +3151,13 @@
     const mbst = store.get('mirrorBest', 0), rbst = store.get('rushBest', 0);
     $('mirrorInfo').textContent = mbst ? `Rekorun: ${mbst}` : 'Kontroller ters, yön döner';
     $('rushInfo').textContent = rbst ? `Rekorun: ${rbst}` : 'Sadece boss savaşları';
-    const dbst = store.get('darkBest', 0);
+    const dbst = store.get('darkBest', 0), cbst = store.get('chaosBest', 0);
     $('darkInfo').textContent = dbst ? `Rekorun: ${dbst}` : 'Işık sadece senin etrafında';
-    const wav = wheelAvail();
-    $('menuDot').style.display = (av || wav) ? 'block' : 'none';
+    $('chaosInfo').textContent = cbst ? `Rekorun: ${cbst}` : 'Her 15 sn kural değişir';
+    const wav = wheelAvail(), sc = seasonClaimable();
+    $('menuDot').style.display = (av || wav || sc) ? 'block' : 'none';
+    $('seasonBadge').style.display = sc ? 'flex' : 'none'; $('seasonBadge').textContent = sc;
+    $('seasonInfo').textContent = `Kademe ${seasonTier()}/${SEASON_TIERS}` + (sc ? ` · ${sc} ödül hazır!` : ` · ${seasonLeft()} gün kaldı`);
     $('wheelBadge').style.display = wav ? 'flex' : 'none';
     $('wheelInfo').textContent = wav ? 'Bugünkü çevirme hakkın hazır!' : 'Yarın yine çevirebilirsin';
     const WR = wkRule(), wd = wkData();
@@ -3070,11 +3202,13 @@
       const btn = document.createElement('button');
       if (sel) { btn.className = 'buy picked'; btn.textContent = 'Seçili'; }
       else if (has) { btn.className = 'buy pick'; btn.textContent = 'Seç'; }
+      else if (s.season) { btn.className = 'buy pick'; btn.textContent = '🎟️ Sezon'; }
       else if (s.chest) { btn.className = 'buy pick'; btn.textContent = '🎁 Sandıktan'; }
       else { btn.className = 'buy price' + (coins < s.price ? ' no' : ''); btn.textContent = `✦ ${s.price}`; }
       btn.addEventListener('click', e => {
         e.stopPropagation();
         if (sel) return;
+        if (!has && s.season) { openSub('seasonP', 'shop'); return; }
         if (!has && s.chest) { shopTab = 'chest'; renderShop(); return; }
         if (has) { skinId = s.id; beep(600, .08, 'triangle', .05); }
         else {
@@ -3231,7 +3365,7 @@
       ic.classList.remove('shake');
       const roll = Math.random();
       const normalLeft = SKINS.filter(s => !s.chest && !owned.includes(s.id));
-      const chestLeft = SKINS.filter(s => s.chest && !owned.includes(s.id));
+      const chestLeft = SKINS.filter(s => s.chest && !s.season && !owned.includes(s.id));
       let txt, skin = null;
       if (roll < 0.20 && chestLeft.length) { skin = chestLeft[Math.floor(Math.random() * chestLeft.length)]; unlock('chestX'); }
       else if (roll < 0.55 && normalLeft.length) { skin = normalLeft[Math.floor(Math.random() * normalLeft.length)]; }
@@ -3389,7 +3523,7 @@
   }
 
   let panelOpen = 'menu', backTo = 'menu';
-  const PANELS = ['menu', 'over', 'pause', 'shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'wheelP', 'codeP', 'turnNext', 'turnsResult', 'cardModal', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'];
+  const PANELS = ['menu', 'over', 'pause', 'shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'wheelP', 'codeP', 'seasonP', 'turnNext', 'turnsResult', 'cardModal', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'];
   function show(id) {
     PANELS.forEach(p => $(p).classList.toggle('hidden', p !== id)); panelOpen = id;
     $('menu').classList.remove('drawer-open');
@@ -3407,6 +3541,7 @@
     if (id === 'campMap') renderMap();
     if (id === 'boardP') renderBoard();
     if (id === 'wheelP') { $('wheelPrize').textContent = ''; renderWheel(); }
+    if (id === 'seasonP') renderSeason();
   }
   function beginPlay() {
     reset();
@@ -3433,6 +3568,7 @@
     if (mode === 'mirror') banner('TERS DÜNYA 🔄<small>Kontroller ters · yön kendiliğinden döner</small>', '#7cf3ff', 2);
     if (mode === 'rush') banner('BOSS AKINI 👹<small>Boss üstüne boss! Yıldız topla, vur!</small>', '#ff5cf0', 1.5);
     if (mode === 'dark') banner('KARANLIK UZAY 🌑<small>Sadece etrafını görebilirsin</small>', '#9b8cff', 2);
+    if (mode === 'chaos') nextChaos(true);
     if (mode === 'weekly') { const WR = wkRule(); banner(`${WR.em} ${WR.name.toUpperCase()}<small>${WR.ds} · hedef ${WR.target}</small>`, '#ffd166', 2.5); }
     beep(440, .15, 'triangle', .06, 440);
   }
@@ -3465,14 +3601,14 @@
     if ($('menu').classList.contains('drawer-open')) { $('menu').classList.remove('drawer-open'); return 'ok'; }
     if (state === 'play' || state === 'pause') { if (state === 'play' || resumeCD <= 0) pause(); return 'ok'; }
     if (panelOpen === 'cardModal') { show(cardBack); return 'ok'; }
-    if (['shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'wheelP', 'codeP', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'].includes(panelOpen)) { if (panelOpen === 'wheelP' && wheelBusy) return 'ok'; show(backTo); refreshMeta(); return 'ok'; }
+    if (['shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'wheelP', 'codeP', 'seasonP', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'].includes(panelOpen)) { if (panelOpen === 'wheelP' && wheelBusy) return 'ok'; show(backTo); refreshMeta(); return 'ok'; }
     if (state === 'over' || panelOpen === 'over' || panelOpen === 'turnNext' || panelOpen === 'turnsResult') { toMenu(); return 'ok'; }
     if (Date.now() - backExitT < 2000) return 'exit';
     backExitT = Date.now(); toast('Çıkmak için tekrar geri bas'); return 'ok';
   };
   function toMenu() {
     $('hint').classList.remove('show'); $('novaBar').style.display = 'none'; tut = false;
-    state = 'menu'; mode = 'solo'; turns = null; duoMatch = null; fixedSeed = null; setRng(null); reset(); show('menu'); refreshMeta();
+    state = 'menu'; mode = 'solo'; turns = null; duoMatch = null; fixedSeed = null; chTarget = 0; setRng(null); reset(); show('menu'); refreshMeta();
     $('revBtn').style.display = 'none'; showZones(false); $('powers').innerHTML = ''; lastPowHtml = '';
   }
 
@@ -3491,6 +3627,9 @@
   on('mirrorBtn', () => startMode('mirror'));
   on('rushBtn', () => startMode('rush'));
   on('darkBtn', () => startMode('dark'));
+  on('chaosBtn', () => startMode('chaos'));
+  on('seasonBtn', () => openSub('seasonP', 'menu'));
+  on('seasonAll', claimAllSeason);
   on('weeklyBtn', () => startMode('weekly'));
   on('wheelBtn', () => openSub('wheelP', 'menu'));
   on('mpackBtn', () => { settings.mpack = ((settings.mpack || 0) + 1) % MPACKS.length; store.set('settings', settings); renderSettings(); chime(); });
@@ -3503,11 +3642,11 @@
   on('wheelSpin', spinWheel);
   on('codeBtn', () => { $('codeErr').textContent = ''; $('codeIn').value = ''; openSub('codeP', 'menu'); });
   function playCode() {
-    const n = parseCode($('codeIn').value);
-    if (n == null) { $('codeErr').textContent = '⚠️ Kod geçersiz. Örnek: YRG-1A2B3C'; beep(120, .15, 'square', .04); return; }
+    const ch = parseChal($('codeIn').value);
+    if (!ch) { $('codeErr').textContent = '⚠️ Kod geçersiz. Örnek: YRG-1A2B3C-45'; beep(120, .15, 'square', .04); return; }
     $('codeIn').blur();
-    fixedSeed = n; startMode('solo');
-    banner(`🔑 ${seedCode(n)}<small>Arkadaşının parkuru</small>`, '#7cf3ff', 2);
+    fixedSeed = ch.seed; chTarget = ch.target; startMode('solo');
+    banner(chTarget ? `🎯 HEDEF: ${chTarget}<small>Arkadaşının skorunu geç!</small>` : `🔑 ${seedCode(ch.seed)}<small>Arkadaşının parkuru</small>`, '#7cf3ff', 2);
   }
   on('codeGo', playCode);
   on('statsBtn', () => openSub('statsP', 'menu'));
@@ -3597,7 +3736,7 @@
     if (k === 'Escape' && $('menu').classList.contains('drawer-open')) { $('menu').classList.remove('drawer-open'); return; }
     if (k === 'Escape') {
       if (state === 'play' || state === 'pause') pause();
-      else if (['shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'wheelP', 'codeP', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'].includes(panelOpen)) show(backTo);
+      else if (['shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'wheelP', 'codeP', 'seasonP', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'].includes(panelOpen)) show(backTo);
       else if (panelOpen === 'cardModal') show(cardBack);
       return;
     }
@@ -3616,7 +3755,7 @@
       if (k === 'ArrowDown') move(players[1], -1);
       return;
     }
-    const ms = mode === 'mirror' ? -1 : 1;
+    const ms = mirr() ? -1 : 1;
     if (k === 'ArrowLeft' || k === 'ArrowDown' || k === 'a' || k === 'A') move(P0(), -ms);
     if (k === 'ArrowRight' || k === 'ArrowUp' || k === 'd' || k === 'D') move(P0(), ms);
     if (k === ' ') reverse(P0());
@@ -3629,11 +3768,11 @@
       return;
     }
     const left = x < W / 2;
-    const inv = !!settings.lefty !== (mode === 'mirror'); // Ters Dünya'da kontroller ters
+    const inv = !!settings.lefty !== mirr(); // Ters Dünya'da kontroller ters
     move(P0(), (left !== inv) ? -1 : 1);
   }
   function showZones(on) {
-    const lefty = !!settings.lefty, inv = lefty !== (mode === 'mirror');
+    const lefty = !!settings.lefty, inv = lefty !== mirr();
     $('zL').firstChild.textContent = inv ? '← DIŞ' : '← İÇ';
     $('zR').firstChild.textContent = inv ? 'İÇ →' : 'DIŞ →';
     $('zones').style.display = on ? 'block' : 'none';
@@ -3655,7 +3794,7 @@
     if (Math.abs(dy) > 28) {
       s0.done = true;
       const p = mode === 'duo' ? (s0.x < W / 2 ? players[0] : players[1]) : P0();
-      move(p, ((dy < 0) !== (mode === 'mirror')) ? 1 : -1);
+      move(p, ((dy < 0) !== mirr()) ? 1 : -1);
     }
   });
   const endTouch = e => {
