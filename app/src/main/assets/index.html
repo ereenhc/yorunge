@@ -180,6 +180,11 @@
   .day.got{opacity:.4}
   .day.now{border-color:#ffd166;box-shadow:0 0 18px rgba(255,209,102,.35);transform:scale(1.06)}
   .day.big b{font-size:16px}
+  /* son anlar (tekrar izle) + evcil yoldaş */
+  .rpCv{height:min(58vh,520px);max-width:92vw;width:auto;border-radius:14px;border:1px solid #2e3360;background:#05060f}
+  #petCv{width:160px;height:160px}
+  #petName{text-align:center;font-weight:700}
+  .wkHead{font-size:13px;letter-spacing:.15em;opacity:.7;margin:14px 0 4px}
   /* sezon kartı */
   .sbar{width:min(520px,94vw);height:10px;border-radius:6px;background:#1a1d36;overflow:hidden;margin:4px 0 10px}
   .sbar i{display:block;height:100%;background:linear-gradient(90deg,#ff9f43,#ffd166);border-radius:6px}
@@ -324,6 +329,8 @@
     <div class="dTitle">MENÜ</div>
     <button class="dItem" id="dailyRwBtn"><span class="em">🎁</span><span>Günlük Ödül<small id="drInfo">Her gün ✦ kazan</small></span><span class="badge" id="drBadge" style="display:none">!</span></button>
     <button class="dItem" id="seasonBtn"><span class="em">🎟️</span><span>Sezon Kartı<small id="seasonInfo">30 kademe ödül</small></span><span class="badge" id="seasonBadge" style="display:none">!</span></button>
+    <button class="dItem" id="puzBtn"><span class="em">🧩</span><span>Bulmacalar<small id="puzInfo">Az hamlede tüm yıldızları topla</small></span></button>
+    <button class="dItem" id="petBtn"><span class="em">🐾</span><span>Evcil Yoldaş<small id="petInfo">Oynadıkça büyür</small></span></button>
     <button class="dItem" id="achBtn"><span class="em">🏆</span><span>Başarımlar</span></button>
     <button class="dItem" id="boardBtn"><span class="em">🏅</span><span>Skorlar</span></button>
     <button class="dItem" id="statsBtn"><span class="em">📊</span><span>İstatistikler</span></button>
@@ -420,6 +427,8 @@
   <h2>GÖREVLER</h2>
   <div class="coins">✦ <span class="coinVal">0</span></div>
   <div class="mlist" id="mList"></div>
+  <div class="wkHead" id="wkHead">📅 HAFTALIK GÖREVLER</div>
+  <div class="mlist" id="wList"></div>
   <p class="small">Görevler tek kişilik tüm modlarda ilerler (2 kişi ve Sırayla hariç).</p>
   <button class="ghost back">← Geri</button>
 </div>
@@ -477,6 +486,37 @@
 </div>
 
 <!-- DAILY REWARD -->
+<div class="panel hidden" id="puzP">
+  <h2>🧩 BULMACALAR</h2>
+  <p>Tüm yıldızları süre bitmeden topla, mayınlara çarpma. Ne kadar az hamle (halka ya da yön değişimi), o kadar çok ⭐!</p>
+  <div class="coins" id="puzTotal">⭐ 0</div>
+  <div class="nodes" id="puzGrid"></div>
+  <button class="ghost back">← Geri</button>
+</div>
+
+<div class="panel hidden" id="petP">
+  <h2>🐾 EVCİL YOLDAŞ</h2>
+  <canvas id="petCv" width="160" height="160"></canvas>
+  <div class="names"><input id="petName" maxlength="14" autocomplete="off" spellcheck="false"></div>
+  <p id="petStage"></p>
+  <div class="sbar"><i id="petFill"></i></div>
+  <p class="small" id="petNext"></p>
+  <button class="main" id="petFeed">🍖 Besle · 50 ✦</button>
+  <div class="row">
+    <button class="ghost" id="petColor">🎨 Renk</button>
+    <button class="ghost" id="petShow">👁️</button>
+  </div>
+  <button class="ghost back">← Geri</button>
+</div>
+
+<div class="panel hidden" id="replayP">
+  <h2>🎬 SON ANLAR</h2>
+  <canvas id="rpCv" class="rpCv"></canvas>
+  <div class="sbar"><i id="rpBar"></i></div>
+  <button class="ghost" id="rpSlow">🐢 Yavaş çekim</button>
+  <button class="ghost back">← Geri</button>
+</div>
+
 <div class="panel hidden" id="seasonP">
   <h2>🎟️ SEZON KARTI</h2>
   <p id="seasonTxt">Oynadıkça XP kazan, kademeleri aç, ödülleri topla!</p>
@@ -524,6 +564,7 @@
     <button class="gold" id="shareBtn">📤 Skor kartı</button>
   </div>
   <div class="row">
+    <button class="ghost" id="replayBtn">🎬 Son anlar</button>
     <button class="ghost" id="overShop">🛒 Mağaza</button>
     <button class="ghost" id="overMiss">🎯 Görevler<span class="badge" id="missBadge2" style="display:none">0</span></button>
     <button class="ghost" id="mapBtn2" style="display:none">🗺️ Harita</button>
@@ -954,7 +995,13 @@
   }
   const mTarget = m => MT[m.type].target(m.tier);
   const mDone = m => m.prog >= mTarget(m);
-  const claimable = () => miss.active.filter(mDone).length;
+  const claimable = () => miss.active.filter(mDone).length + wClaimable();
+  function wClaimable() {
+    try {
+      const d = wmData();
+      return d.list.filter(m => !m.got && m.prog >= WMT[m.type].n).length + (d.list.every(m => m.got) && !d.bonus ? 1 : 0);
+    } catch (e) { return 0; }
+  }
   function saveAll() {
     store.set('coins', coins); store.set('owned', owned); store.set('skinId', skinId);
     store.set('upg', upg); store.set('missions', miss); store.set('best', best); store.set('daily', daily);
@@ -1144,7 +1191,10 @@
   { id: 'hole50', ic: '🌀', name: 'Olay Ufku', ds: 'Kara Delik modunda 50 puan', rw: 100 },
   { id: 'iron40', ic: '🪙', name: 'Demir İrade', ds: 'Tek Can modunda 40 puan', rw: 120 },
   { id: 'dstar', ic: '💫', name: 'Karanlığın Gücü', ds: 'Bir kara yıldız topla', rw: 40 },
-  { id: 'master3', ic: '🥇', name: 'Usta', ds: '3 modda altın ustalık madalyası al', rw: 250 }
+  { id: 'master3', ic: '🥇', name: 'Usta', ds: '3 modda altın ustalık madalyası al', rw: 250 },
+  { id: 'puzAll', ic: '🧩', name: 'Bulmaca Dehası', ds: 'Tüm bulmacaları çöz', rw: 200 },
+  { id: 'petMax', ic: '🐾', name: 'Efsane Yoldaş', ds: 'Evcil yoldaşını son aşamaya büyüt', rw: 200 },
+  { id: 'weekAll', ic: '📅', name: 'Haftanın Yıldızı', ds: 'Bir haftanın tüm görevlerini bitir', rw: 150 }
   ];
   let achieved = store.get('ach', {});
   function unlock(id) {
@@ -1324,6 +1374,172 @@
     }
     $('seasonAll').classList.toggle('no', !seasonClaimable());
   }
+
+  // ================= HAFTALIK GÖREVLER =================
+  const WMT = {
+    games: { txt: 'Bu hafta 20 oyun oyna', n: 20, rw: 250 },
+    stars: { txt: 'Bu hafta 400 yıldız topla', n: 400, rw: 300 },
+    gold: { txt: 'Bu hafta 30 altın yıldız topla', n: 30, rw: 250 },
+    boss: { txt: 'Bu hafta 3 boss yen', n: 3, rw: 300 },
+    score: { txt: 'Bu hafta tek oyunda 80 puan yap', n: 80, rw: 300, per: true },
+    near: { txt: 'Bu hafta 40 kıl payı yap', n: 40, rw: 250 },
+    powers: { txt: 'Bu hafta 25 güçlendirme al', n: 25, rw: 250 },
+    combo: { txt: 'Bu hafta x20 kombo yap', n: 20, rw: 300, per: true }
+  };
+  const W_BONUS = 500;
+  let wm = store.get('wmiss', null);
+  function wmData() {
+    const wk = weekIdx();
+    if (!wm || wm.wk !== wk || !Array.isArray(wm.list)) {
+      const keys = Object.keys(WMT), pick = [];
+      let s = (wk * 7919 + 17) % 233280;
+      while (pick.length < 3) { s = (s * 9301 + 49297) % 233280; const k = keys[Math.floor(s / 233280 * keys.length)]; if (!pick.includes(k)) pick.push(k); }
+      wm = { wk, list: pick.map(type => ({ type, prog: 0, got: false })), bonus: false };
+      store.set('wmiss', wm);
+    }
+    return wm;
+  }
+
+  // ================= BULMACALAR =================
+  // s: yıldızlar [halka, derece (üst=0, saat yönü)], m: sabit mayınlar, t: süre (sn), par: en az hamle
+  const PUZ = [
+    { s: [[1, 60], [1, 120], [1, 180]], m: [], t: 12, par: 0, ds: 'Sadece izle' },
+    { s: [[1, 60], [2, 120], [2, 180]], m: [], t: 12, par: 1, ds: 'Dışarı çık' },
+    { s: [[0, 90], [2, 200]], m: [], t: 12, par: 3, ds: 'İçeri, sonra dışarı' },
+    { s: [[1, 90], [2, 180], [1, 270]], m: [[1, 180]], t: 14, par: 2, ds: 'Mayından kaç' },
+    { s: [[0, 60], [2, 120], [0, 180], [2, 240]], m: [], t: 12, par: 7, ds: 'Zikzak' },
+    { s: [[0, 110], [2, 200]], m: [[1, 70], [1, 150]], t: 12, par: 3, ds: 'Mayın tarlası' },
+    { s: [[1, 330], [1, 300], [0, 240]], m: [[0, 100], [1, 100], [2, 100]], t: 14, par: 2, ds: 'Geri dön!' },
+    { s: [[1, 90], [2, 150], [0, 300]], m: [[0, 200], [1, 200], [2, 200]], t: 16, par: 4, ds: 'Duvar' },
+    { s: [[2, 30], [0, 90], [2, 150], [0, 210], [2, 270], [0, 330]], m: [], t: 10, par: 11, ds: 'Hızlı parmaklar' },
+    { s: [[1, 90], [2, 180], [1, 270]], m: [[1, 60], [1, 120], [1, 240], [1, 300]], t: 12, par: 5, ds: 'Dar geçit' },
+    { s: [[2, 60], [2, 330], [0, 300]], m: [[0, 90], [1, 90], [2, 90], [0, 270], [1, 270], [2, 270]], t: 16, par: 4, ds: 'Kafes' },
+    { s: [[0, 30], [2, 90], [0, 150], [1, 200], [2, 250], [0, 300]], m: [[1, 45], [1, 120], [2, 180], [0, 220], [1, 280]], t: 12, par: 9, ds: 'Büyük final' }
+  ];
+  let puzIdx = 0, puzMoves = 0, puzRes = null;
+  let puzProg = store.get('puz', []);
+  const puzStars = () => puzProg.reduce((a, b) => a + (b || 0), 0);
+  function setupPuz() {
+    const d = PUZ[puzIdx], rad = deg => (deg - 90) * Math.PI / 180;
+    for (const [ring, deg] of d.s) stars.push({ a: rad(deg), ring, life: 1e9, born: -1, gold: false, x: 0, y: 0, free: false, to: null });
+    for (const [ring, deg] of d.m) mines.push({ ring, a: rad(deg), warn: 0, fuse: 1e9, boom: 0 });
+    puzMoves = 0; puzRes = null;
+  }
+  function puzTick() {
+    const d = PUZ[puzIdx], left = Math.max(0, d.t - gt);
+    $('lvl').textContent = `${Math.ceil(left)}s · ${puzMoves}`;
+    $('hudR').textContent = stars.length;
+    if (!stars.length) { puzRes = { win: true }; endGame(); return; }
+    if (left <= 0) { puzRes = { win: false, reason: '⏰ Süre doldu!' }; endGame(); }
+  }
+  function startPuz(i) {
+    puzIdx = i; mode = 'puz'; setRng(null);
+    beginPlay();
+    const d = PUZ[i];
+    resumeCD = 3; // başlamadan önce 3-2-1: bulmacayı gör, planını yap
+    banner(`🧩 BULMACA ${i + 1}<small>${d.ds} · ${d.s.length} yıldız · ${d.t} sn · en az ${d.par} hamle</small>`, '#7cf3ff', 0);
+  }
+  function renderPuz() {
+    $('puzTotal').textContent = `⭐ ${puzStars()} / ${PUZ.length * 3}`;
+    const g = $('puzGrid'); g.innerHTML = '';
+    PUZ.forEach((d, i) => {
+      const st = puzProg[i] || 0, open = i === 0 || puzProg[i - 1] > 0;
+      const b = document.createElement('button');
+      b.className = 'node' + (open ? '' : ' lock') + (open && !st ? ' cur' : '') + (st ? ' done' : '');
+      b.innerHTML = `<b>${i + 1}</b><span class="st">${open ? '★'.repeat(st) + '☆'.repeat(3 - st) : '🔒'}</span>`;
+      b.addEventListener('click', e => { e.stopPropagation(); if (open) startPuz(i); else beep(120, .15, 'square', .04); });
+      g.appendChild(b);
+    });
+  }
+
+  // ================= EVCİL YOLDAŞ =================
+  const PET_ST = [{ n: 'Yumurta', need: 0 }, { n: 'Yavru', need: 60 }, { n: 'Genç', need: 250 }, { n: 'Yetişkin', need: 700 }, { n: 'Efsane', need: 1600 }];
+  const PET_COL = ['#7cf3ff', '#ff5cf0', '#5cff9d', '#ffd166', '#b98bff', '#ff9f43'];
+  const PET_FEED = 50;
+  let pet = Object.assign({ xp: 0, name: 'Pıtırcık', on: true, c: 0 }, store.get('pet', {}));
+  let petA = null;
+  const petStage = () => PET_ST.reduce((s, x, i) => (pet.xp >= x.need ? i : s), 0);
+  function petGain(n) {
+    if (!(n > 0)) return;
+    const s0 = petStage(); pet.xp += n; store.set('pet', pet);
+    const s1 = petStage();
+    if (s1 > s0) { setTimeout(() => toast(`🐣 ${pet.name} büyüdü: ${PET_ST[s1].n}!`), 1200); if (s1 >= PET_ST.length - 1) unlock('petMax'); }
+  }
+  function drawPet(c, x, y, R, st, col, time) {
+    c.save(); c.translate(x, y);
+    if (st === 0) { // yumurta: sallanır
+      c.rotate(Math.sin(time * 4) * 0.25);
+      c.fillStyle = '#f4efe0'; c.strokeStyle = col; c.lineWidth = Math.max(1, R * 0.12);
+      c.beginPath(); c.ellipse(0, 0, R * 0.75, R, 0, 0, 6.283); c.fill(); c.stroke();
+      c.beginPath(); c.moveTo(-R * 0.6, 0); c.lineTo(-R * 0.25, -R * 0.2); c.lineTo(0, R * 0.05); c.lineTo(R * 0.3, -R * 0.2); c.lineTo(R * 0.6, 0); c.stroke();
+      c.restore(); return;
+    }
+    c.translate(0, Math.sin(time * 5) * R * 0.08);
+    if (st >= 3) { // kanatlar
+      const fl = Math.sin(time * 14) * 0.4;
+      c.fillStyle = 'rgba(255,255,255,.55)';
+      for (const sg of [-1, 1]) { c.save(); c.scale(sg, 1); c.rotate(-0.4 + fl); c.beginPath(); c.ellipse(R * 0.95, -R * 0.2, R * 0.6, R * 0.3, -0.3, 0, 6.283); c.fill(); c.restore(); }
+    }
+    if (st >= 2) { // kulaklar
+      c.fillStyle = col;
+      for (const sg of [-1, 1]) { c.beginPath(); c.moveTo(sg * R * 0.3, -R * 0.75); c.lineTo(sg * R * 0.75, -R * 1.25); c.lineTo(sg * R * 0.82, -R * 0.4); c.fill(); }
+    }
+    c.fillStyle = col; c.shadowColor = col; c.shadowBlur = R * 0.8;
+    c.beginPath(); c.arc(0, 0, R, 0, 6.283); c.fill(); c.shadowBlur = 0;
+    c.fillStyle = 'rgba(255,255,255,.35)'; c.beginPath(); c.ellipse(0, R * 0.35, R * 0.55, R * 0.4, 0, 0, 6.283); c.fill();
+    const blink = (time % 3.2) < 0.12 ? 0.15 : 1;
+    c.fillStyle = '#0b0d1f';
+    for (const sg of [-1, 1]) { c.beginPath(); c.ellipse(sg * R * 0.35, -R * 0.15, R * 0.14, R * 0.2 * blink, 0, 0, 6.283); c.fill(); }
+    c.fillStyle = '#fff';
+    for (const sg of [-1, 1]) { c.beginPath(); c.arc(sg * R * 0.31, -R * 0.22, R * 0.05, 0, 6.283); c.fill(); }
+    c.strokeStyle = '#0b0d1f'; c.lineWidth = Math.max(1, R * 0.08);
+    c.beginPath(); c.arc(0, R * 0.12, R * 0.18, 0.3, Math.PI - 0.3); c.stroke();
+    if (st >= 4) { // efsane: hale
+      c.strokeStyle = '#ffd166'; c.lineWidth = Math.max(1.5, R * 0.12); c.shadowColor = '#ffd166'; c.shadowBlur = 10;
+      c.beginPath(); c.ellipse(0, -R * 1.35, R * 0.55, R * 0.16, 0, 0, 6.283); c.stroke(); c.shadowBlur = 0;
+    }
+    c.restore();
+  }
+  function renderPet() {
+    const st = petStage(), nx = PET_ST[st + 1];
+    if (document.activeElement !== $('petName')) $('petName').value = pet.name;
+    $('petStage').textContent = `${PET_ST[st].n} · ${pet.xp} XP`;
+    $('petFill').style.width = (nx ? (pet.xp - PET_ST[st].need) / (nx.need - PET_ST[st].need) * 100 : 100) + '%';
+    $('petNext').textContent = nx ? `${nx.n} olmasına ${nx.need - pet.xp} XP · oyunlarda topladığın her yıldız 1 XP` : 'En son aşamada! 👑';
+    $('petShow').textContent = pet.on ? '👁️ Oyunda göster: Açık' : '👁️ Oyunda göster: Kapalı';
+    $('petFeed').classList.toggle('no', coins < PET_FEED || !nx);
+  }
+
+  // ================= SON ANLAR (tekrar izle) =================
+  // oyun sırasında her 0.12 sn'de ekranın küçük bir kopyası halka tampona yazılır (~7 sn)
+  const RP_N = 60, RP_W = 200;
+  let rpBuf = [], rpHead = 0, rpCount = 0, rpAcc = 0, rpTimer = null, rpSlow = false;
+  function rpReset() { rpHead = 0; rpCount = 0; rpAcc = 0; }
+  function rpTick(dt) {
+    const live = state === 'play' && resumeCD <= 0;
+    const dying = state === 'over' && deathZoom > 0.05 && panelOpen !== 'replayP';
+    if ((!live && !dying) || !cv.width) return;
+    rpAcc += dt; if (rpAcc < 0.12) return; rpAcc = 0;
+    const w = RP_W, h = Math.round(RP_W * cv.height / cv.width);
+    let f = rpBuf[rpHead];
+    if (!f || f.width !== w || f.height !== h) { f = document.createElement('canvas'); f.width = w; f.height = h; rpBuf[rpHead] = f; }
+    try { f.getContext('2d').drawImage(cv, 0, 0, w, h); } catch (e) { return; }
+    rpHead = (rpHead + 1) % RP_N; rpCount = Math.min(RP_N, rpCount + 1);
+  }
+  function playReplay() {
+    clearInterval(rpTimer);
+    if (rpCount < 2) return;
+    const out = $('rpCv'), start = (rpHead - rpCount + RP_N) % RP_N, f0 = rpBuf[start];
+    out.width = f0.width; out.height = f0.height;
+    let i = 0;
+    rpTimer = setInterval(() => {
+      if (panelOpen !== 'replayP') { clearInterval(rpTimer); return; }
+      const k = Math.min(i, rpCount - 1), f = rpBuf[(start + k) % RP_N];
+      const c = out.getContext('2d'); c.clearRect(0, 0, out.width, out.height); c.drawImage(f, 0, 0, out.width, out.height);
+      $('rpBar').style.width = (k / (rpCount - 1) * 100) + '%';
+      i++; if (i >= rpCount + 10) i = 0; // sonda kısa bekle, başa sar
+    }, rpSlow ? 300 : 120);
+  }
   let weekly = store.get('weekly', { wk: 0, best: 0, done: false });
   function wkData() { if (weekly.wk !== weekIdx()) weekly = { wk: weekIdx(), best: 0, done: false }; return weekly; }
 
@@ -1365,6 +1581,7 @@
     lasers = []; missiles = []; holes = []; laserT = 8; missileT = 6; holeT = 10; dodged = 0;
     campBase = 0; campBossSpawned = false;
     if (mode === 'camp') { const d = CAMP[campIdx]; level = d.diff; campBase = (d.diff - 1) * 15; bossNext = 999; }
+    if (mode === 'puz') { bossNext = 999; setupPuz(); }
     $('bossBar').style.display = 'none';
     $('lvl').textContent = 1;
     setupHud();
@@ -1380,9 +1597,9 @@
       $('hudRL').textContent = '2. Oyuncu'; $('hudRL').style.color = solidOf(players[1].skin);
     } else {
       $('hudLL').textContent = mode === 'turns' ? turns.names[turns.idx] : (mode === 'zen' ? 'Yıldız' : 'Skor'); $('hudLL').style.color = '';
-      $('hudRL').textContent = { daily: 'Bugün en iyi', turns: 'Lider', time: 'En iyi', zen: 'Mod', hard: 'Hardcore rekor', camp: 'En iyi', weekly: 'Hedef' }[mode] || 'Rekor'; $('hudRL').style.color = mode === 'hard' ? '#ff5c7a' : '';
+      $('hudRL').textContent = { daily: 'Bugün en iyi', turns: 'Lider', time: 'En iyi', zen: 'Mod', hard: 'Hardcore rekor', camp: 'En iyi', weekly: 'Hedef', puz: 'Kalan yıldız' }[mode] || 'Rekor'; $('hudRL').style.color = mode === 'hard' ? '#ff5c7a' : '';
     }
-    $('hudML').textContent = (mode === 'duo' && duoMatch) ? `Tur ${duoMatch.round}/${duoMatch.total} · ${duoMatch.wins[0]}-${duoMatch.wins[1]} · Sv` : mode === 'daily' ? 'Meydan okuma · Sv' : (mode === 'time' ? 'Kalan süre' : (mode === 'camp' ? `Bölüm ${campIdx + 1} · Hedef` : 'Seviye'));
+    $('hudML').textContent = (mode === 'duo' && duoMatch) ? `Tur ${duoMatch.round}/${duoMatch.total} · ${duoMatch.wins[0]}-${duoMatch.wins[1]} · Sv` : mode === 'daily' ? 'Meydan okuma · Sv' : (mode === 'time' ? 'Kalan süre' : (mode === 'camp' ? `Bölüm ${campIdx + 1} · Hedef` : (mode === 'puz' ? `Bulmaca ${puzIdx + 1} · süre · hamle` : 'Seviye')));
     updHud();
   }
   function updHud() {
@@ -1430,12 +1647,14 @@
       parts.push({ x: q.x, y: q.y, vx: ca * v * d + (Math.random() - .5) * 50, vy: sa * v * d + (Math.random() - .5) * 50, life: .5, c: colorOf(p.skin, k * 20), r: Math.random() * 2 + 1 });
     }
     p.ring = n; tutMoved = true;
+    if (mode === 'puz') puzMoves++;
     beep((d > 0 ? 520 : 380) + p.i * 90, .09, 'triangle', .06, d > 0 ? 200 : -120);
     setTimeout(() => beep(d > 0 ? 950 : 320, .08, 'sine', .03, d > 0 ? 500 : -160), 35);
   }
   function reverse(p) {
     if (state !== 'play' || !p || !p.alive || p.revCd > 0) return;
     p.dir *= -1; p.revCd = [1, 0.7, 0.45][U_.revUp || 0]; p.stats.rev++;
+    if (mode === 'puz') puzMoves++;
     if (lasers.length) unlock('laser');
     tutRev = true;
     const q = ppos(p);
@@ -1813,9 +2032,10 @@
       if (left < 10 && Math.floor(left) !== Math.floor(left + dt)) beep(880, .06, 'square', .04);
     }
     if (mode === 'camp') { campTick(); if (state !== 'play') return; }
+    if (mode === 'puz') { puzTick(); if (state !== 'play') return; }
     const nl = 1 + Math.floor(effScore() / 15);
     if (nl > level) {
-      level = nl; if (mode !== 'time' && mode !== 'camp') $('lvl').textContent = level; chime();
+      level = nl; if (mode !== 'time' && mode !== 'camp' && mode !== 'puz') $('lvl').textContent = level; chime();
       if (level >= 10 && NR === 3 && mode !== 'duo') {
         NR = 4; setRings();
         banner('YENİ YÖRÜNGE!<small>4. halka açıldı</small>', '#7cf3ff', 2);
@@ -1823,7 +2043,7 @@
       }
       if (mode !== 'zen') {
         if (level >= bossNext && !boss) { bossNext += 5; spawnBoss(); }
-        else if (!boss && t >= bannerHold) startEvent();
+        else if (!boss && t >= bannerHold && mode !== 'puz') startEvent();
         else banner(`SEVİYE ${level}`, '#b98bff');
         if (level >= 5) unlock('l5');
         if (level >= 10) unlock('l10');
@@ -1926,8 +2146,8 @@
     // spawns
     starT -= dt;
     const maxStars = (mode === 'duo' || mode === 'zen' || boss) ? 6 : 4;
-    if (starT <= 0 && stars.length < maxStars) { spawnStar(); starT = (mode === 'duo' || boss ? 0.65 : (mode === 'zen' ? 0.6 : 1.0)) + R.star() * 1.2; }
-    const calm = mode === 'zen';
+    if (starT <= 0 && stars.length < maxStars && mode !== 'puz') { spawnStar(); starT = (mode === 'duo' || boss ? 0.65 : (mode === 'zen' ? 0.6 : 1.0)) + R.star() * 1.2; }
+    const calm = mode === 'zen' || mode === 'puz';
     if (!calm && !boss && !(event && event.type === 'stars')) {
       spawnT -= edt;
       if (spawnT <= 0) {
@@ -1945,7 +2165,7 @@
       if (flareT <= 0) { spawnFlare(); flareT = Math.max(6, 14 - level) + R.flare() * 5; }
     }
     powerT -= dt;
-    if (powerT <= 0) { if (powerups.length < 2) spawnPower(); powerT = (11 - U_.powerFreq * 2.5) + R.power() * 6; }
+    if (powerT <= 0) { if (powerups.length < 2 && mode !== 'puz') spawnPower(); powerT = (11 - U_.powerFreq * 2.5) + R.power() * 6; }
 
     // stars
     const magR = U * 0.32;
@@ -2097,7 +2317,7 @@
     }
 
     // ---- new enemies: spawn ----
-    if (mode !== 'zen' && !boss) {
+    if (!calm && !boss) {
       if (level >= 6 && mode !== 'duo') {
         laserT -= edt;
         if (laserT <= 0) {
@@ -2129,12 +2349,12 @@
       }
     }
 
-    if (mode !== 'zen' && !boss) {
+    if (!calm && !boss) {
       if (level >= 5) { beltT -= edt; if (beltT <= 0 && !belts.length) { spawnBelt(); beltT = Math.max(9, 18 - level * 0.5) + R.hunter() * 6; } }
       if (level >= 4) { cometT -= edt; if (cometT <= 0) { spawnComet(); cometT = Math.max(6, 14 - level * 0.4) + R.flare() * 5; } }
       if (level >= 6) { mineT -= edt; if (mineT <= 0 && mines.length < 2) { spawnMine(); mineT = Math.max(7, 15 - level * 0.4) + R.rock() * 5; } }
     }
-    if (level >= 2 && !boss && !event && !cons) { consT -= dt; if (consT <= 0) { spawnCons(); consT = 25 + R.star() * 10; } }
+    if (level >= 2 && !boss && !event && !cons && !calm) { consT -= dt; if (consT <= 0) { spawnCons(); consT = 25 + R.star() * 10; } }
 
     // ---- yörünge mayınları ----
     for (let i = mines.length - 1; i >= 0; i--) {
@@ -2372,6 +2592,15 @@
       if (MT[m.type].per) m.prog = Math.max(m.prog, v); else m.prog += v;
       m.prog = Math.min(m.prog, mTarget(m));
     }
+    // haftalık görevler
+    const d = wmData();
+    const vals = { games: 1, stars: p.stats.stars, gold: p.stats.gold, boss: bossKills, score: p.score, near: p.stats.near || 0, powers: p.stats.powers, combo: p.stats.maxCombo };
+    for (const m of d.list) {
+      if (m.got) continue;
+      const W = WMT[m.type], v = vals[m.type] || 0;
+      m.prog = Math.min(W.n, W.per ? Math.max(m.prog, v) : m.prog + v);
+    }
+    store.set('wmiss', d);
     return claimable() - before;
   }
 
@@ -2471,6 +2700,29 @@
           text: win ? `Yörünge Yolculuk modunda ${campIdx + 1}. bölümü ${'⭐'.repeat(campProg[campIdx] || 1)} ile geçtim! 🗺️` : `Yörünge'nin ${campIdx + 1}. bölümü beni yendi 😤 Sen geçebilir misin?`
         };
         $('nextBtn').style.display = win && campIdx < CAMP.length - 1 ? '' : 'none';
+      } else if (mode === 'puz') {
+        const d = PUZ[puzIdx], win = !!(puzRes && puzRes.win);
+        title = `BULMACA ${puzIdx + 1} · ${d.ds.toUpperCase()}`;
+        if (win) {
+          const st = puzMoves <= d.par ? 3 : (puzMoves <= d.par + 3 ? 2 : 1);
+          const prev = puzProg[puzIdx] || 0;
+          let reward = 0;
+          if (st > prev) { reward = (prev ? 0 : 30 + puzIdx * 5) + (st - prev) * 15; puzProg[puzIdx] = st; store.set('puz', puzProg); coins += reward; }
+          scoreTxt = `<div class="bigstars">${[0, 1, 2].map(k => `<span class="${k < st ? '' : 'off'}">⭐</span>`).join('')}</div>`;
+          msg = `✅ ${puzMoves} hamlede çözdün · en az: ${d.par}`;
+          note = reward ? `🎁 Ödül: +${reward} ✦` : (st < 3 ? `3 yıldız için en fazla ${d.par} hamle` : 'Kusursuz! ⭐⭐⭐');
+          if (PUZ.every((_, i) => puzProg[i] > 0)) unlock('puzAll');
+          chime(); setTimeout(chime, 250);
+        } else {
+          scoreTxt = '✖';
+          msg = (puzRes && puzRes.reason) || '💥 Mayına çarptın!';
+          note = `${stars.length} yıldız kaldı · tekrar dene!`;
+        }
+        lastShare = {
+          head: `BULMACA ${puzIdx + 1}`, big: win ? '★'.repeat(puzProg[puzIdx] || 1) : '✖', sub: win ? `${puzMoves} hamlede çözdüm` : 'Bu bulmacayı çözebilir misin?', skins: [p.skin],
+          text: win ? `Yörünge'nin ${puzIdx + 1}. bulmacasını ${puzMoves} hamlede çözdüm! 🧩 Sen kaç hamlede çözersin?` : `Yörünge'nin ${puzIdx + 1}. bulmacası beni yendi 🧩`
+        };
+        $('nextBtn').style.display = win && puzIdx < PUZ.length - 1 ? '' : 'none';
       } else if (mode === 'hard') {
         title = 'HARDCORE 💀';
         if (p.score > hardBest) { hardBest = p.score; store.set('hardBest', hardBest); msg = 'Yeni Hardcore rekoru! 💀'; }
@@ -2539,9 +2791,10 @@
           text: `Yörünge'de ${p.score} puan yaptım! Geç beni 🚀`
         };
       }
-      if (p.score > best && mode !== 'time' && mode !== 'hard' && mode !== 'camp' && mode !== 'weekly' && !isRec()) best = p.score;
+      if (p.score > best && mode !== 'time' && mode !== 'hard' && mode !== 'camp' && mode !== 'weekly' && mode !== 'puz' && !isRec()) best = p.score;
       checkMastery(mode, p.score);
-      const brk = (mode !== 'camp' && mode !== 'weekly') ? addBoard(mode, p.score) : 0;
+      const brk = (mode !== 'camp' && mode !== 'weekly' && mode !== 'puz') ? addBoard(mode, p.score) : 0;
+      petGain(p.stats.stars);
       boardHi = brk ? board[mode][brk - 1].d : null;
       if (brk === 1 && (board[mode] || []).length >= 5) unlock('board1');
       if (bossKills) msg += `  ·  🌑 ${bossKills} boss yenildi`;
@@ -2569,7 +2822,8 @@
     saveAll();
     $('overTitle').textContent = title;
     $('againBtn').textContent = (mode === 'duo' && duoMatch) ? (duoMatch.done ? 'RÖVANŞ' : 'SONRAKİ TUR ▶') : 'TEKRAR';
-    if (mode !== 'camp') $('nextBtn').style.display = 'none';
+    if (mode !== 'camp' && mode !== 'puz') $('nextBtn').style.display = 'none';
+    $('replayBtn').style.display = rpCount >= 5 ? '' : 'none';
     $('mapBtn2').style.display = mode === 'camp' ? '' : 'none';
     $('overShop').style.display = mode === 'camp' ? 'none' : '';
     $('finalScore').innerHTML = scoreTxt;
@@ -3118,6 +3372,13 @@
         }
       }
 
+      // evcil yoldaş: oyuncunun biraz arkasından yumuşakça takip eder
+      if (pet.on && mode !== 'duo' && P0() && P0().alive) {
+        const p0 = P0(), want = p0.a - p0.dir * 0.32;
+        petA = petA == null ? want : petA + angDiff(want, petA) * 0.12;
+        const pq = pos(petA, p0.r + U * 0.045), ps = petStage();
+        drawPet(ctx, pq.x, pq.y, U * 0.013 * (1 + ps * 0.12), ps, PET_COL[pet.c % PET_COL.length], t);
+      } else petA = null;
       for (const p of players) {
         if (!p.alive) continue;
         const sk = p.skin;
@@ -3254,6 +3515,8 @@
     const wav = wheelAvail(), sc = seasonClaimable();
     $('menuDot').style.display = (av || wav || sc) ? 'block' : 'none';
     $('seasonBadge').style.display = sc ? 'flex' : 'none'; $('seasonBadge').textContent = sc;
+    $('puzInfo').textContent = `⭐ ${puzStars()} / ${PUZ.length * 3} · ${PUZ.length} bulmaca`;
+    $('petInfo').textContent = `${pet.name} · ${PET_ST[petStage()].n}`;
     $('seasonInfo').textContent = `Kademe ${seasonTier()}/${SEASON_TIERS}` + (sc ? ` · ${sc} ödül hazır!` : ` · ${seasonLeft()} gün kaldı`);
     $('wheelBadge').style.display = wav ? 'flex' : 'none';
     $('wheelInfo').textContent = wav ? 'Bugünkü çevirme hakkın hazır!' : 'Yarın yine çevirebilirsin';
@@ -3605,6 +3868,29 @@
       row.appendChild(btn);
       l.appendChild(row);
     });
+    // haftalık görevler + hepsini bitirme bonusu
+    const d = wmData(), wl = $('wList'); wl.innerHTML = '';
+    $('wkHead').textContent = `📅 HAFTALIK GÖREVLER · ${7 - ((dayIdx() + 3) % 7)} GÜN KALDI`;
+    const mkRow = (title, sub, pct, state, onClaim) => {
+      const row = document.createElement('div'); row.className = 'mrow' + (state === 'can' ? ' done' : '');
+      row.innerHTML = `<div class="tx"><b>${title}</b>` + (pct != null ? `<div class="prog"><i style="width:${pct}%"></i></div>` : '') + `<div class="rw">${sub}</div></div>`;
+      const btn = document.createElement('button');
+      if (state === 'got') { btn.className = 'buy picked'; btn.textContent = '✓'; btn.disabled = true; }
+      else if (state === 'can') { btn.className = 'buy price'; btn.textContent = 'AL'; }
+      else { btn.className = 'buy pick'; btn.textContent = state; btn.disabled = true; }
+      btn.addEventListener('click', e => { e.stopPropagation(); if (state === 'can') onClaim(); });
+      row.appendChild(btn); wl.appendChild(row);
+    };
+    d.list.forEach(m => {
+      const W = WMT[m.type], done = m.prog >= W.n;
+      mkRow(W.txt, `${m.prog} / ${W.n} &nbsp;·&nbsp; Ödül ✦ ${W.rw}`, Math.min(100, m.prog / W.n * 100),
+        m.got ? 'got' : (done ? 'can' : `%${Math.floor(m.prog / W.n * 100)}`),
+        () => { m.got = true; coins += W.rw; store.set('wmiss', d); chime(); saveAll(); renderMissions(); });
+    });
+    const all = d.list.every(m => m.got);
+    mkRow('🎁 Haftanın hepsini bitir', `3 haftalık görevin hepsini al · Bonus ✦ ${W_BONUS}`, null,
+      d.bonus ? 'got' : (all ? 'can' : `${d.list.filter(m => m.got).length}/3`),
+      () => { d.bonus = true; coins += W_BONUS; store.set('wmiss', d); chime(); setTimeout(chime, 200); buzzP([30, 40, 30, 40, 90]); unlock('weekAll'); saveAll(); renderMissions(); });
   }
 
   // ================= FLOW =================
@@ -3617,11 +3903,13 @@
     if (panelOpen === 'shop' && shopTab === 'skins') drawPreviews();
     if (panelOpen === 'shop' && shopTab === 'suns') drawSunPreviews();
     if (panelOpen === 'shop' && shopTab === 'fx') drawFxPreviews(dt);
+    if (panelOpen === 'petP') { const c = $('petCv').getContext('2d'); c.clearRect(0, 0, 160, 160); drawPet(c, 80, 92, 32, petStage(), PET_COL[pet.c % PET_COL.length], t); }
+    rpTick(dt);
     requestAnimationFrame(loop);
   }
 
   let panelOpen = 'menu', backTo = 'menu';
-  const PANELS = ['menu', 'over', 'pause', 'shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'wheelP', 'codeP', 'seasonP', 'turnNext', 'turnsResult', 'cardModal', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'];
+  const PANELS = ['menu', 'over', 'pause', 'shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'wheelP', 'codeP', 'seasonP', 'puzP', 'petP', 'replayP', 'turnNext', 'turnsResult', 'cardModal', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'];
   function show(id) {
     PANELS.forEach(p => $(p).classList.toggle('hidden', p !== id)); panelOpen = id;
     $('menu').classList.remove('drawer-open');
@@ -3640,9 +3928,12 @@
     if (id === 'boardP') renderBoard();
     if (id === 'wheelP') { $('wheelPrize').textContent = ''; renderWheel(); }
     if (id === 'seasonP') renderSeason();
+    if (id === 'puzP') renderPuz();
+    if (id === 'petP') renderPet();
+    if (id === 'replayP') playReplay();
   }
   function beginPlay() {
-    reset();
+    reset(); rpReset();
     state = 'play';
     show(null);
     tut = mode === 'solo' && !store.get('tutDone', false);
@@ -3683,6 +3974,7 @@
   function again() {
     if (mode === 'turns') return;
     if (mode === 'camp') { startCamp(campIdx); return; }
+    if (mode === 'puz') { startPuz(puzIdx); return; }
     if (mode === 'duo') { if (!duoMatch || duoMatch.done) duoMatch = newDuo(duoMatch ? duoMatch.total : duoRounds); else duoMatch.round++; }
     startMode(mode);
   }
@@ -3701,7 +3993,7 @@
     if ($('menu').classList.contains('drawer-open')) { $('menu').classList.remove('drawer-open'); return 'ok'; }
     if (state === 'play' || state === 'pause') { if (state === 'play' || resumeCD <= 0) pause(); return 'ok'; }
     if (panelOpen === 'cardModal') { show(cardBack); return 'ok'; }
-    if (['shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'wheelP', 'codeP', 'seasonP', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'].includes(panelOpen)) { if (panelOpen === 'wheelP' && wheelBusy) return 'ok'; show(backTo); refreshMeta(); return 'ok'; }
+    if (['shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'wheelP', 'codeP', 'seasonP', 'puzP', 'petP', 'replayP', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'].includes(panelOpen)) { if (panelOpen === 'wheelP' && wheelBusy) return 'ok'; show(backTo); refreshMeta(); return 'ok'; }
     if (state === 'over' || panelOpen === 'over' || panelOpen === 'turnNext' || panelOpen === 'turnsResult') { toMenu(); return 'ok'; }
     if (Date.now() - backExitT < 2000) return 'exit';
     backExitT = Date.now(); toast('Çıkmak için tekrar geri bas'); return 'ok';
@@ -3732,6 +4024,19 @@
   on('ironBtn', () => startMode('iron'));
   on('seasonBtn', () => openSub('seasonP', 'menu'));
   on('seasonAll', claimAllSeason);
+  on('puzBtn', () => openSub('puzP', 'menu'));
+  on('petBtn', () => openSub('petP', 'menu'));
+  on('replayBtn', () => { if (rpCount >= 5) openSub('replayP', 'over'); });
+  on('rpSlow', () => { rpSlow = !rpSlow; $('rpSlow').textContent = rpSlow ? '▶️ Normal hız' : '🐢 Yavaş çekim'; playReplay(); });
+  on('petFeed', () => {
+    if (!PET_ST[petStage() + 1]) { toast('Yoldaşın zaten en son aşamada! 👑'); return; }
+    if (coins < PET_FEED) { beep(120, .15, 'square', .04); toast(`${PET_FEED - coins} ✦ daha lazım`); return; }
+    coins -= PET_FEED; petGain(30); saveAll(); refreshMeta(); renderPet(); chime(); buzz(30);
+  });
+  on('petColor', () => { pet.c = (pet.c + 1) % PET_COL.length; store.set('pet', pet); beep(600, .08, 'triangle', .05); });
+  on('petShow', () => { pet.on = !pet.on; store.set('pet', pet); renderPet(); });
+  $('petName').addEventListener('change', () => { pet.name = $('petName').value.trim().slice(0, 14) || 'Pıtırcık'; store.set('pet', pet); renderPet(); refreshMeta(); });
+  $('petName').addEventListener('click', e => e.stopPropagation());
   on('weeklyBtn', () => startMode('weekly'));
   on('wheelBtn', () => openSub('wheelP', 'menu'));
   on('mpackBtn', () => { settings.mpack = ((settings.mpack || 0) + 1) % MPACKS.length; store.set('settings', settings); renderSettings(); chime(); });
@@ -3754,7 +4059,7 @@
   on('statsBtn', () => openSub('statsP', 'menu'));
   on('campBtn', () => openSub('campMap', 'menu'));
   on('boardBtn', () => { boardHi = null; openSub('boardP', 'menu'); });
-  on('nextBtn', () => startCamp(Math.min(campIdx + 1, CAMP.length - 1)));
+  on('nextBtn', () => { if (mode === 'puz') startPuz(Math.min(puzIdx + 1, PUZ.length - 1)); else startCamp(Math.min(campIdx + 1, CAMP.length - 1)); });
   on('mapBtn2', () => { const m = mode; toMenu(); openSub('campMap', 'menu'); });
   document.querySelectorAll('#boardTabs button').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); boardTab = b.dataset.b; renderBoard(); }));
   on('chestOpen', openChest);
@@ -3838,7 +4143,7 @@
     if (k === 'Escape' && $('menu').classList.contains('drawer-open')) { $('menu').classList.remove('drawer-open'); return; }
     if (k === 'Escape') {
       if (state === 'play' || state === 'pause') pause();
-      else if (['shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'wheelP', 'codeP', 'seasonP', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'].includes(panelOpen)) show(backTo);
+      else if (['shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'wheelP', 'codeP', 'seasonP', 'puzP', 'petP', 'replayP', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'].includes(panelOpen)) show(backTo);
       else if (panelOpen === 'cardModal') show(cardBack);
       return;
     }
