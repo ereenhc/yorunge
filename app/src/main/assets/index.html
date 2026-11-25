@@ -100,6 +100,14 @@
   .bigtxt .dItem small{font-size:14px}
   .bigtxt #hud{transform:scale(1.15);transform-origin:top center}
   .mode .em{font-size:24px}
+  .mgroup{grid-column:1/-1;text-align:left;font-size:12px;font-weight:700;letter-spacing:.2em;opacity:.6;margin:8px 0 -2px 4px}
+  .mgroup:first-child{margin-top:0}
+  .modesBig{position:relative;display:flex;align-items:center;justify-content:center;gap:14px;width:min(420px,86vw);padding:16px 20px;border-radius:18px;border:1px solid rgba(124,243,255,.5);background:linear-gradient(90deg,rgba(124,243,255,.14),rgba(185,139,255,.14));color:#e8ecff;font:inherit;cursor:pointer;text-align:left;transition:transform .15s}
+  .modesBig:active{transform:scale(.97)}
+  .modesBig .em{font-size:30px}
+  .modesBig b{font-size:18px;letter-spacing:.12em}
+  .modesBig small{display:block;font-size:12px;opacity:.65;margin-top:2px}
+  .modesBig .badge{top:-6px;right:-6px}
   .mode b{font-size:14px}
   .mode span{font-size:11px;opacity:.6;line-height:1.3}
   @media (max-width:460px){.row>button.main{padding:13px 20px;font-size:15px;letter-spacing:.06em}.modes{grid-template-columns:1fr 1fr;gap:8px}.mode{padding:10px 6px}.mode .em{font-size:20px}.mode b{font-size:13px}h1{font-size:44px}.mode.lastw{grid-column:auto;flex-direction:column;text-align:center;gap:4px}}
@@ -348,27 +356,38 @@
     <button class="main" id="startBtn">TEK KİŞİ</button>
     <button class="main" id="campBtn" style="background:#ffd166;box-shadow:0 0 30px rgba(255,209,102,.4)">🗺️ YOLCULUK</button>
   </div>
-  <div class="modes">
-    <button class="mode wide" id="weeklyBtn"><div class="em" id="wkEm">⚡</div><div><b>Haftalık Meydan Okuma</b><br><span id="wkInfo">Her hafta yeni kural</span></div></button>
-    <button class="mode" id="dailyBtn"><div class="em">📅</div><div><b>Günün Meydan Okuması</b><br><span id="dailyInfo">Herkese aynı parkur</span></div></button>
-    <button class="mode" id="duoBtn"><div class="em">👥</div><div><b>2 Kişi</b><br><span>Aynı telefonda kapışma</span></div></button>
-    <button class="mode" id="turnsBtn"><div class="em">🔁</div><div><b>Sırayla</b><br><span>2–4 kişi turnuva</span></div></button>
-    <button class="mode" id="timeBtn"><div class="em">⏱️</div><div><b>Zamana Karşı</b><br><span id="timeInfo">60 saniye, ölüm yok</span></div></button>
-    <button class="mode" id="zenBtn"><div class="em">🧘</div><div><b>Zen</b><br><span>Düşman yok, sadece yıldız</span></div></button>
-    <button class="mode" id="hardBtn"><div class="em">💀</div><div><b>Hardcore</b><br><span id="hardInfo">Her şey hızlı · 2x puan</span></div></button>
-    <button class="mode" id="mirrorBtn"><div class="em">🔄</div><div><b>Ters Dünya</b><br><span id="mirrorInfo">Kontroller ters, yön döner</span></div></button>
-    <button class="mode" id="rushBtn"><div class="em">👹</div><div><b>Boss Akını</b><br><span id="rushInfo">Sadece boss savaşları</span></div></button>
-    <button class="mode" id="darkBtn"><div class="em">🌑</div><div><b>Karanlık Uzay</b><br><span id="darkInfo">Işık sadece senin etrafında</span></div></button>
-    <button class="mode" id="holeBtn"><div class="em">🌀</div><div><b>Kara Delik</b><br><span id="holeInfo">İç halka 3x puan, çekim var</span></div></button>
-    <button class="mode" id="ironBtn"><div class="em">🪙</div><div><b>Tek Can</b><br><span id="ironInfo">Kalkan yok, puan katlanır</span></div></button>
-    <button class="mode" id="chaosBtn"><div class="em">🎲</div><div><b>Kaos</b><br><span id="chaosInfo">Her 15 sn kural değişir</span></div></button>
-  </div>
+  <button class="modesBig" id="modesBtn"><span class="em">🎮</span><span><b>MODLAR</b><small id="modesSub">13 farklı mod</small></span><span class="badge" id="modesBadge" style="display:none">!</span></button>
   <div class="row">
     <button class="ghost" id="shopBtn">🛒 Mağaza</button>
     <button class="ghost" id="missBtn">🎯 Görevler<span class="badge" id="missBadge" style="display:none">0</span></button>
   </div>
   <div class="keys pcOnly">
     <kbd>←</kbd> içe &nbsp; <kbd>→</kbd> dışa &nbsp; <kbd>Boşluk</kbd> yön değiştir &nbsp; <kbd>P</kbd> duraklat
+  </div>
+</div>
+
+<!-- MODLAR -->
+<div class="panel top hidden" id="modesP">
+  <button class="ghost back">← Geri</button>
+  <h2>🎮 MODLAR</h2>
+  <div class="modes">
+    <div class="mgroup">⚡ MEYDAN OKUMALAR</div>
+    <button class="mode wide" id="weeklyBtn"><div class="em" id="wkEm">⚡</div><div><b>Haftalık Meydan Okuma</b><br><span id="wkInfo">Her hafta yeni kural</span></div></button>
+    <button class="mode" id="dailyBtn"><div class="em">📅</div><div><b>Günün Meydan Okuması</b><br><span id="dailyInfo">Herkese aynı parkur</span></div></button>
+    <div class="mgroup">👥 ARKADAŞLARLA</div>
+    <button class="mode" id="duoBtn"><div class="em">👥</div><div><b>2 Kişi</b><br><span>Aynı telefonda kapışma</span></div></button>
+    <button class="mode" id="turnsBtn"><div class="em">🔁</div><div><b>Sırayla</b><br><span>2–4 kişi turnuva</span></div></button>
+    <div class="mgroup">🎯 KLASİK</div>
+    <button class="mode" id="timeBtn"><div class="em">⏱️</div><div><b>Zamana Karşı</b><br><span id="timeInfo">60 saniye, ölüm yok</span></div></button>
+    <button class="mode" id="zenBtn"><div class="em">🧘</div><div><b>Zen</b><br><span>Düşman yok, sadece yıldız</span></div></button>
+    <button class="mode" id="hardBtn"><div class="em">💀</div><div><b>Hardcore</b><br><span id="hardInfo">Her şey hızlı · 2x puan</span></div></button>
+    <div class="mgroup">✨ ÖZEL MODLAR</div>
+    <button class="mode" id="mirrorBtn"><div class="em">🔄</div><div><b>Ters Dünya</b><br><span id="mirrorInfo">Kontroller ters, yön döner</span></div></button>
+    <button class="mode" id="rushBtn"><div class="em">👹</div><div><b>Boss Akını</b><br><span id="rushInfo">Sadece boss savaşları</span></div></button>
+    <button class="mode" id="darkBtn"><div class="em">🌑</div><div><b>Karanlık Uzay</b><br><span id="darkInfo">Işık sadece senin etrafında</span></div></button>
+    <button class="mode" id="holeBtn"><div class="em">🌀</div><div><b>Kara Delik</b><br><span id="holeInfo">İç halka 3x puan, çekim var</span></div></button>
+    <button class="mode" id="ironBtn"><div class="em">🪙</div><div><b>Tek Can</b><br><span id="ironInfo">Kalkan yok, puan katlanır</span></div></button>
+    <button class="mode" id="chaosBtn"><div class="em">🎲</div><div><b>Kaos</b><br><span id="chaosInfo">Her 15 sn kural değişir</span></div></button>
   </div>
 </div>
 
@@ -3523,6 +3542,8 @@
     const WR = wkRule(), wd = wkData();
     $('wkEm').textContent = WR.em;
     $('wkInfo').textContent = `${WR.name}: ${WR.ds} · ` + (wd.done ? '✓ ödül alındı' : `${WR.target} puan → +${WK_REWARD} ✦`);
+    $('modesSub').textContent = wd.done ? '13 farklı mod' : `13 mod · Bu hafta: ${WR.em} ${WR.name}`;
+    $('modesBadge').style.display = wd.done ? 'none' : 'flex';
     // bildirimlerin duruma göre mesaj seçebilmesi için oyun durumunu Android'e aktar
     if (AB && AB.syncNotif) {
       const cheap = SKINS.filter(s => !s.chest && !(owned || []).includes(s.id)).sort((a, b) => a.price - b.price)[0];
@@ -3909,9 +3930,10 @@
   }
 
   let panelOpen = 'menu', backTo = 'menu';
-  const PANELS = ['menu', 'over', 'pause', 'shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'wheelP', 'codeP', 'seasonP', 'puzP', 'petP', 'replayP', 'turnNext', 'turnsResult', 'cardModal', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'];
+  const PANELS = ['menu', 'over', 'pause', 'shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'wheelP', 'codeP', 'seasonP', 'puzP', 'petP', 'replayP', 'modesP', 'turnNext', 'turnsResult', 'cardModal', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'];
   function show(id) {
     PANELS.forEach(p => $(p).classList.toggle('hidden', p !== id)); panelOpen = id;
+    if (id === 'modesP') backTo = 'menu'; // 2 Kişi/Sırayla kurulumundan dönünce Geri yine ana sayfaya gider
     $('menu').classList.remove('drawer-open');
     $('hud').style.opacity = (id === null || id === 'pause' || id === 'over') ? 1 : 0;
   }
@@ -3993,7 +4015,7 @@
     if ($('menu').classList.contains('drawer-open')) { $('menu').classList.remove('drawer-open'); return 'ok'; }
     if (state === 'play' || state === 'pause') { if (state === 'play' || resumeCD <= 0) pause(); return 'ok'; }
     if (panelOpen === 'cardModal') { show(cardBack); return 'ok'; }
-    if (['shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'wheelP', 'codeP', 'seasonP', 'puzP', 'petP', 'replayP', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'].includes(panelOpen)) { if (panelOpen === 'wheelP' && wheelBusy) return 'ok'; show(backTo); refreshMeta(); return 'ok'; }
+    if (['shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'wheelP', 'codeP', 'seasonP', 'puzP', 'petP', 'replayP', 'modesP', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'].includes(panelOpen)) { if (panelOpen === 'wheelP' && wheelBusy) return 'ok'; show(backTo); refreshMeta(); return 'ok'; }
     if (state === 'over' || panelOpen === 'over' || panelOpen === 'turnNext' || panelOpen === 'turnsResult') { toMenu(); return 'ok'; }
     if (Date.now() - backExitT < 2000) return 'exit';
     backExitT = Date.now(); toast('Çıkmak için tekrar geri bas'); return 'ok';
@@ -4010,7 +4032,8 @@
   on('dailyBtn', () => startMode('daily'));
   // 2 kişi: önce kaç tur oynanacağını sor
   const renderRoundSeg = () => document.querySelectorAll('#roundSeg button').forEach(b => b.classList.toggle('on', +b.dataset.n === duoRounds));
-  on('duoBtn', () => { renderRoundSeg(); openSub('duoSetup', 'menu'); });
+  on('duoBtn', () => { renderRoundSeg(); openSub('duoSetup', 'modesP'); });
+  on('modesBtn', () => openSub('modesP', 'menu'));
   document.querySelectorAll('#roundSeg button').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); duoRounds = +b.dataset.n; store.set('duoRounds', duoRounds); renderRoundSeg(); }));
   on('duoGo', () => { duoMatch = newDuo(duoRounds); startMode('duo'); });
   on('timeBtn', () => startMode('time'));
@@ -4112,7 +4135,7 @@
     if (k === 'vib' && settings.vib) buzz(40);
     if (k === 'notif') { try { if (AB && AB.setNotifEnabled) AB.setNotifEnabled(!!settings.notif); } catch (e2) {} }
   }));
-  on('turnsBtn', () => openSub('turnsSetup', 'menu'));
+  on('turnsBtn', () => openSub('turnsSetup', 'modesP'));
   on('turnsGo', () => startTurns());
   on('tnGo', playTurn);
   on('rematchBtn', () => { turnCount = turns.count; startTurns(); });
@@ -4143,7 +4166,7 @@
     if (k === 'Escape' && $('menu').classList.contains('drawer-open')) { $('menu').classList.remove('drawer-open'); return; }
     if (k === 'Escape') {
       if (state === 'play' || state === 'pause') pause();
-      else if (['shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'wheelP', 'codeP', 'seasonP', 'puzP', 'petP', 'replayP', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'].includes(panelOpen)) show(backTo);
+      else if (['shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'wheelP', 'codeP', 'seasonP', 'puzP', 'petP', 'replayP', 'modesP', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'].includes(panelOpen)) show(backTo);
       else if (panelOpen === 'cardModal') show(cardBack);
       return;
     }
