@@ -2632,7 +2632,15 @@
     return claimable() - before;
   }
 
+  // oyun sonu: içeride bir hata olsa bile bitiş ekranı mutlaka açılır (oyuncu ölüm ekranında takılı kalmaz)
   function endGame() {
+    try { endGameInner(); }
+    catch (e) {
+      console.error('Yorunge endGame hatası:', e && e.stack || e);
+      if (mode !== 'turns') setTimeout(() => { if (state === 'over') show('over'); }, 700);
+    }
+  }
+  function endGameInner() {
     state = 'over';
     comboEl.style.opacity = 0;
     boss = null; $('bossBar').style.display = 'none';
@@ -2839,6 +2847,7 @@
     const showCode = mode === 'solo' && runSeed != null;
     $('overCode').style.display = showCode ? '' : 'none';
     if (showCode) {
+      const p = P0(); // (bu blok yukarıdaki else'in dışında; p burada ayrıca tanımlanmalı)
       const chc = seedCode(runSeed) + (p.score > 0 ? '-' + p.score : '');
       $('overCode').textContent = `🔑 Meydan okuma kodu: ${chc} · arkadaşın bu skoru geçmeye çalışsın`;
       if (lastShare) lastShare.text += ` 🔑 Meydan okuma kodum: ${chc} (Menü → Meydan Okuma Kodu)`;
