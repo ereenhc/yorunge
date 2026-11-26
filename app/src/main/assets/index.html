@@ -2033,6 +2033,7 @@
     if (state !== 'play') {
       for (const p of players) if (p.alive) { p.a += dt * 0.6 * p.dir; p.r += (rings[p.ring] - p.r) * Math.min(1, dt * 10); }
       if (deathZoom > 0) deathZoom = Math.max(0, deathZoom - dt / 1.2);
+      if (shake > 0) shake = Math.max(0, shake - dt * 30); // oyun bitince de sarsıntı sönsün
       updParts(dt * (deathZoom > 0 ? 0.3 : 1)); // ölüm anında parçacıklar yavaş çekimde
       return;
     }
@@ -3042,7 +3043,7 @@
   // ================= DRAW =================
   function draw() {
     ctx.save();
-    if (shake > 0 && settings.shake) ctx.translate((Math.random() - .5) * shake, (Math.random() - .5) * shake);
+    if (shake > 0 && settings.shake && state !== 'pause' && resumeCD <= 0) ctx.translate((Math.random() - .5) * shake, (Math.random() - .5) * shake);
     if (deathZoom > 0 && deathAt && state === 'over') {
       const zs = 1 + 0.2 * Math.sin((1 - deathZoom) * Math.PI);
       ctx.translate(deathAt.x, deathAt.y); ctx.scale(zs, zs); ctx.translate(-deathAt.x, -deathAt.y);
