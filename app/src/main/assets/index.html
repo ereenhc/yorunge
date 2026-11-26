@@ -58,7 +58,8 @@
   #zR span{right:calc(14px + var(--sar))}
 
   .panel{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;background:radial-gradient(circle at center,rgba(5,6,15,.55),rgba(5,6,15,.93));transition:opacity .3s;overflow:auto;padding:calc(24px + var(--sat)) var(--sar) calc(24px + var(--sab)) var(--sal);box-sizing:border-box}
-  .panel.hidden{opacity:0;pointer-events:none}
+  .panel.hidden{opacity:0;pointer-events:none;visibility:hidden;transition:opacity .3s,visibility 0s .3s}
+  .panel.hidden *{animation-play-state:paused}
   .panel.top{justify-content:flex-start;padding-top:calc(28px + var(--sat))}
   /* İçerik ekrana sığmazsa üst kısım kesilmesin, kaydırılabilsin */
   .panel>*{flex-shrink:0}
@@ -490,6 +491,7 @@
     <div class="setrow">🔔 Bildirimler <small style="opacity:.5;font-weight:400">günlük hatırlatma</small> <button class="tgl" data-k="notif"></button></div>
     <div class="setrow">👻 Rekor kopyası <button class="tgl" data-k="ghostRun"></button></div>
     <div class="setrow">🔠 Büyük yazı <button class="tgl" data-k="big"></button></div>
+    <div class="setrow">🎬 Son anları kaydet <button class="tgl" data-k="replay"></button></div>
     <div class="setrow">💡 İpuçlarını tekrar göster <button class="ghost" id="tutReset" style="padding:6px 14px">Sıfırla</button></div>
   </div>
   <div class="row">
@@ -820,8 +822,10 @@
       c.beginPath(); c.ellipse(0, 0, R * (1.5 + k * 0.45), R * (1.1 + k * 0.3), 0, 0, 4.2); c.stroke();
     }
     c.restore();
-    c.fillStyle = '#000'; c.shadowColor = '#b98bff'; c.shadowBlur = 25 * warn;
-    c.beginPath(); c.arc(x, y, R * 1.05, 0, 6.283); c.fill(); c.shadowBlur = 0;
+    c.strokeStyle = `rgba(185,139,255,${0.5 * warn})`; c.lineWidth = R * 0.25;
+    c.beginPath(); c.arc(x, y, R * 1.15, 0, 6.283); c.stroke();
+    c.fillStyle = '#000';
+    c.beginPath(); c.arc(x, y, R * 1.05, 0, 6.283); c.fill();
   }
 
   // ================= XP / RANK =================
@@ -1030,7 +1034,7 @@
   }
 
   // ================= SETTINGS =================
-  let settings = Object.assign({ music: true, sfx: true, vib: true, shake: true, swipe: false, lefty: false, ghostRun: true, notif: true, big: false }, store.get('settings', {}));
+  let settings = Object.assign({ music: true, sfx: true, vib: true, shake: true, swipe: false, lefty: false, ghostRun: true, notif: true, big: false, replay: false }, store.get('settings', {}));
   document.documentElement.classList.toggle('bigtxt', !!settings.big);
   // bildirim ayarının asıl kaynağı Android tarafı (alarm orada kuruluyor)
   const AB = window.YorungeAndroid;
@@ -1484,7 +1488,7 @@
     const s1 = petStage();
     if (s1 > s0) { setTimeout(() => toast(`🐣 ${pet.name} büyüdü: ${PET_ST[s1].n}!`), 1200); if (s1 >= PET_ST.length - 1) unlock('petMax'); }
   }
-  function drawPet(c, x, y, R, st, col, time) {
+  function drawPet(c, x, y, R, st, col, time, fancy) {
     c.save(); c.translate(x, y);
     if (st === 0) { // yumurta: sallanır
       c.rotate(Math.sin(time * 4) * 0.25);
@@ -1503,7 +1507,10 @@
       c.fillStyle = col;
       for (const sg of [-1, 1]) { c.beginPath(); c.moveTo(sg * R * 0.3, -R * 0.75); c.lineTo(sg * R * 0.75, -R * 1.25); c.lineTo(sg * R * 0.82, -R * 0.4); c.fill(); }
     }
-    c.fillStyle = col; c.shadowColor = col; c.shadowBlur = R * 0.8;
+    // oyunda shadowBlur kullanma (telefonlarda her karede pahalı): yerine yarı saydam hale
+    if (fancy) { c.shadowColor = col; c.shadowBlur = R * 0.8; }
+    else { c.globalAlpha *= 0.3; c.fillStyle = col; c.beginPath(); c.arc(0, 0, R * 1.45, 0, 6.283); c.fill(); c.globalAlpha /= 0.3; }
+    c.fillStyle = col;
     c.beginPath(); c.arc(0, 0, R, 0, 6.283); c.fill(); c.shadowBlur = 0;
     c.fillStyle = 'rgba(255,255,255,.35)'; c.beginPath(); c.ellipse(0, R * 0.35, R * 0.55, R * 0.4, 0, 0, 6.283); c.fill();
     const blink = (time % 3.2) < 0.12 ? 0.15 : 1;
@@ -1514,7 +1521,7 @@
     c.strokeStyle = '#0b0d1f'; c.lineWidth = Math.max(1, R * 0.08);
     c.beginPath(); c.arc(0, R * 0.12, R * 0.18, 0.3, Math.PI - 0.3); c.stroke();
     if (st >= 4) { // efsane: hale
-      c.strokeStyle = '#ffd166'; c.lineWidth = Math.max(1.5, R * 0.12); c.shadowColor = '#ffd166'; c.shadowBlur = 10;
+      c.strokeStyle = '#ffd166'; c.lineWidth = Math.max(1.5, R * 0.12); if (fancy) { c.shadowColor = '#ffd166'; c.shadowBlur = 10; }
       c.beginPath(); c.ellipse(0, -R * 1.35, R * 0.55, R * 0.16, 0, 0, 6.283); c.stroke(); c.shadowBlur = 0;
     }
     c.restore();
@@ -1531,14 +1538,15 @@
 
   // ================= SON ANLAR (tekrar izle) =================
   // oyun sırasında her 0.12 sn'de ekranın küçük bir kopyası halka tampona yazılır (~7 sn)
-  const RP_N = 60, RP_W = 200;
+  const RP_N = 45, RP_W = 160;
   let rpBuf = [], rpHead = 0, rpCount = 0, rpAcc = 0, rpTimer = null, rpSlow = false;
   function rpReset() { rpHead = 0; rpCount = 0; rpAcc = 0; }
   function rpTick(dt) {
+    if (!settings.replay) return; // ayarlardan açılmadıysa kayıt yok (zayıf telefonlarda kasma yapabiliyor)
     const live = state === 'play' && resumeCD <= 0;
     const dying = state === 'over' && deathZoom > 0.05 && panelOpen !== 'replayP';
     if ((!live && !dying) || !cv.width) return;
-    rpAcc += dt; if (rpAcc < 0.12) return; rpAcc = 0;
+    rpAcc += dt; if (rpAcc < 0.15) return; rpAcc = 0;
     const w = RP_W, h = Math.round(RP_W * cv.height / cv.width);
     let f = rpBuf[rpHead];
     if (!f || f.width !== w || f.height !== h) { f = document.createElement('canvas'); f.width = w; f.height = h; rpBuf[rpHead] = f; }
@@ -3916,17 +3924,24 @@
 
   // ================= FLOW =================
   let last = performance.now();
+  let loopErrs = 0;
   function loop(now) {
+    // bir sonraki kare en başta istenir: bir hata olsa bile oyun donmaz, döngü devam eder
+    requestAnimationFrame(loop);
     const dt = Math.min(0.033, (now - last) / 1000);
     last = now;
-    update(dt);
-    draw();
-    if (panelOpen === 'shop' && shopTab === 'skins') drawPreviews();
-    if (panelOpen === 'shop' && shopTab === 'suns') drawSunPreviews();
-    if (panelOpen === 'shop' && shopTab === 'fx') drawFxPreviews(dt);
-    if (panelOpen === 'petP') { const c = $('petCv').getContext('2d'); c.clearRect(0, 0, 160, 160); drawPet(c, 80, 92, 32, petStage(), PET_COL[pet.c % PET_COL.length], t); }
-    rpTick(dt);
-    requestAnimationFrame(loop);
+    try {
+      update(dt);
+      draw();
+      if (panelOpen === 'shop' && shopTab === 'skins') drawPreviews();
+      if (panelOpen === 'shop' && shopTab === 'suns') drawSunPreviews();
+      if (panelOpen === 'shop' && shopTab === 'fx') drawFxPreviews(dt);
+      if (panelOpen === 'petP') { const c = $('petCv').getContext('2d'); c.clearRect(0, 0, 160, 160); drawPet(c, 80, 92, 32, petStage(), PET_COL[pet.c % PET_COL.length], t, true); }
+      rpTick(dt);
+    } catch (e) {
+      if (loopErrs++ < 5) console.error('Yorunge loop hatası:', e && e.stack || e);
+      try { ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.globalAlpha = 1; ctx.shadowBlur = 0; } catch (e2) {}
+    }
   }
 
   let panelOpen = 'menu', backTo = 'menu';
