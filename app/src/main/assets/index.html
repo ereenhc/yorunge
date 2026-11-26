@@ -107,6 +107,19 @@
   .ibtn span:not(.badge){font-size:10px;opacity:.7;letter-spacing:.02em}
   .ibtn:active{transform:scale(.95)}
   .ibtn.on{border-color:#7cf3ff}
+  /* dereceli */
+  .rankBig{border-color:rgba(255,209,102,.6);background:linear-gradient(90deg,rgba(255,209,102,.16),rgba(255,92,240,.12))}
+  .lgBadge{display:flex;flex-direction:column;align-items:center;gap:4px}
+  .lgBadge span{font-size:64px;line-height:1;filter:drop-shadow(0 0 18px rgba(255,209,102,.4))}
+  .lgBadge b{font-size:24px;letter-spacing:.08em}
+  .lgHist{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;min-height:22px}
+  .lgHist span{font-size:12px;font-weight:700;padding:3px 8px;border-radius:999px;background:rgba(92,255,157,.15);color:#5cff9d}
+  .lgHist span.neg{background:rgba(255,92,122,.15);color:#ff5c7a}
+  .lgLadder{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;width:min(520px,94vw)}
+  .lgLadder div{background:rgba(20,22,45,.75);border:1px solid #2e3360;border-radius:12px;padding:8px 2px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;opacity:.5}
+  .lgLadder div b{font-size:20px}
+  .lgLadder div.on{opacity:1;border-color:#ffd166;box-shadow:0 0 14px rgba(255,209,102,.35)}
+  .lgLadder div.done{opacity:.85}
   .mgroup{grid-column:1/-1;text-align:left;font-size:12px;font-weight:700;letter-spacing:.2em;opacity:.6;margin:8px 0 -2px 4px}
   .mgroup:first-child{margin-top:0}
   .modesBig{position:relative;display:flex;align-items:center;justify-content:center;gap:14px;width:min(420px,86vw);padding:16px 20px;border-radius:18px;border:1px solid rgba(124,243,255,.5);background:linear-gradient(90deg,rgba(124,243,255,.14),rgba(185,139,255,.14));color:#e8ecff;font:inherit;cursor:pointer;text-align:left;transition:transform .15s}
@@ -363,6 +376,7 @@
     <button class="main" id="startBtn">TEK KİŞİ</button>
     <button class="main" id="campBtn" style="background:#ffd166;box-shadow:0 0 30px rgba(255,209,102,.4)">🗺️ YOLCULUK</button>
   </div>
+  <button class="modesBig rankBig" id="rankBtn"><span class="em" id="rankEm">🥉</span><span><b>DERECELİ</b><small id="rankSub">Bronz III · 0 LP</small></span></button>
   <button class="modesBig" id="modesBtn"><span class="em">🎮</span><span><b>MODLAR</b><small id="modesSub">13 farklı mod</small></span><span class="badge" id="modesBadge" style="display:none">!</span></button>
   <div class="row">
     <button class="ghost" id="shopBtn">🛒 Mağaza</button>
@@ -371,6 +385,20 @@
   <div class="keys pcOnly">
     <kbd>←</kbd> içe &nbsp; <kbd>→</kbd> dışa &nbsp; <kbd>Boşluk</kbd> yön değiştir &nbsp; <kbd>P</kbd> duraklat
   </div>
+</div>
+
+<!-- DERECELİ / LİG -->
+<div class="panel top hidden" id="leagueP">
+  <button class="ghost back">← Geri</button>
+  <h2>⚔️ DERECELİ</h2>
+  <div class="lgBadge"><span id="lgEm">🥉</span><b id="lgName">Bronz III</b></div>
+  <div class="sbar"><i id="lgFill"></i></div>
+  <p id="lgTxt"></p>
+  <div class="lgHist" id="lgHist"></div>
+  <button class="main" id="lgPlay">⚔️ OYNA</button>
+  <p class="small">Herkes eşit: mağaza yükseltmeleri kapalı. Her maçta bir rakip var; onu geçersen ekstra LP. 100 LP = üst küme!</p>
+  <div class="lgLadder" id="lgLadder"></div>
+  <p class="small" id="lgSeason"></p>
 </div>
 
 <!-- MODLAR -->
@@ -626,7 +654,7 @@
 <div class="panel hidden" id="codeP">
   <h2>MEYDAN OKUMA KODU</h2>
   <p>Arkadaşının oyun sonunda paylaştığı kodu gir. Aynı parkurda oynarsın, onun skoru hedefin olur. Geçebilecek misin?</p>
-  <div class="names"><input id="codeIn" maxlength="20" placeholder="YRG-XXXXXX-45" autocapitalize="characters" autocomplete="off" spellcheck="false"></div>
+  <div class="names"><input id="codeIn" maxlength="4000" placeholder="YRG-XXXXXX-45" autocapitalize="characters" autocomplete="off" spellcheck="false"></div>
   <p class="small" id="codeErr" style="color:#ff5c7a;min-height:16px"></p>
   <button class="main" id="codeGo">OYNA</button>
   <button class="ghost back">← Geri</button>
@@ -1226,7 +1254,11 @@
   { id: 'master3', ic: '🥇', name: 'Usta', ds: '3 modda altın ustalık madalyası al', rw: 250 },
   { id: 'puzAll', ic: '🧩', name: 'Bulmaca Dehası', ds: 'Tüm bulmacaları çöz', rw: 200 },
   { id: 'petMax', ic: '🐾', name: 'Efsane Yoldaş', ds: 'Evcil yoldaşını son aşamaya büyüt', rw: 200 },
-  { id: 'weekAll', ic: '📅', name: 'Haftanın Yıldızı', ds: 'Bir haftanın tüm görevlerini bitir', rw: 150 }
+  { id: 'weekAll', ic: '📅', name: 'Haftanın Yıldızı', ds: 'Bir haftanın tüm görevlerini bitir', rw: 150 },
+  { id: 'rank1', ic: '⚔️', name: 'İlk Kan', ds: 'Bir dereceli maçta rakibini geç', rw: 50 },
+  { id: 'rankGold', ic: '🥇', name: 'Altın Lig', ds: 'Dereceli\'de Altın lige çık', rw: 200 },
+  { id: 'rankLegend', ic: '👑', name: 'Efsane', ds: 'Dereceli\'de Efsane lige çık', rw: 500 },
+  { id: 'ghostBeat', ic: '👤', name: 'Hayalet Avcısı', ds: 'Arkadaşının hayaletinden daha uzun dayan', rw: 80 }
   ];
   let achieved = store.get('ach', {});
   function unlock(id) {
@@ -1283,6 +1315,33 @@
   let deathZoom = 0, deathAt = null, fixedSeed = null, runSeed = null;
   let rushT = 2, mirrorT = 6, mirrorWarn = false; // Boss Akını / Ters Dünya
   let chTarget = 0, chBeat = false; // meydan okuma kodu: arkadaşın skoru hedef
+  let friendGhost = null; // meydan okuma kodundan gelen arkadaşın koşusu ([a, halka] her 0.1 sn)
+  let rival = null; // dereceli: bu maçın yapay zekâ rakibi {name, target, beat}
+  // hayalet koşuyu kısa bir koda sıkıştır: 5 Hz, her örnek 2 karakter (açı 128 kademe × 4 halka)
+  function encodeGhost(rec) {
+    if (!rec || rec.length < 10) return '';
+    let s = '';
+    for (let i = 0; i < rec.length && i < 1800; i += 2) {
+      const a = ((rec[i][0] % 6.283185) + 6.283185) % 6.283185;
+      const v = (Math.round(a / 6.283185 * 128) % 128) * 4 + Math.min(3, rec[i][1]);
+      s += v.toString(36).toUpperCase().padStart(2, '0');
+    }
+    return s;
+  }
+  function decodeGhost(s) {
+    if (!s || s.length < 10 || s.length % 2) return null;
+    const out = []; let prev = null;
+    for (let i = 0; i < s.length; i += 2) {
+      const v = parseInt(s.substr(i, 2), 36);
+      if (!Number.isFinite(v) || v >= 512) return null;
+      const ring = v & 3, raw = (v >> 2) / 128 * 6.283185;
+      const ref = prev ? prev[0] : -Math.PI / 2;
+      const a = ref + angDiff(raw, ref);
+      if (prev) out.push([(prev[0] + a) / 2, ring]); // 5 Hz → 10 Hz ara örnek
+      prev = [a, ring]; out.push(prev);
+    }
+    return out;
+  }
   // meydan okuma kodu: YRG-<parkur>-<skor>  (eski YRG-<parkur> kodları da çalışır)
   function parseChal(str) {
     const parts = String(str || '').toUpperCase().trim().replace(/^YRG-?/, '').split(/[^0-9A-Z]+/).filter(Boolean);
@@ -1290,7 +1349,7 @@
     const seed = parseCode(parts[0]);
     if (seed == null) return null;
     const sc = parts.length > 1 ? parseInt(parts[1], 10) : 0;
-    return { seed, target: (Number.isFinite(sc) && sc > 0 && sc < 100000) ? sc : 0 };
+    return { seed, target: (Number.isFinite(sc) && sc > 0 && sc < 100000) ? sc : 0, ghost: parts.length > 2 ? decodeGhost(parts[2]) : null };
   }  const seedCode = s => 'YRG-' + s.toString(36).toUpperCase();
   function parseCode(str) {
     const s = String(str || '').toUpperCase().trim().replace(/^YRG-?/, '').replace(/[^0-9A-Z]/g, '');
@@ -1405,6 +1464,70 @@
       g.appendChild(b);
     }
     $('seasonAll').classList.toggle('no', !seasonClaimable());
+  }
+
+  // ================= DERECELİ / LİG =================
+  // Herkes eşit (yükseltme yok). 5 lig × 3 küme, 100 LP = bir üst küme. Sezon (30 gün) sonunda ödül + yumuşak sıfırlama.
+  const LG = [
+    { n: 'Bronz', em: '🥉', c: '#cd7f32', exp: 12, step: 4, rw: 100 },
+    { n: 'Gümüş', em: '🥈', c: '#c0c8d8', exp: 24, step: 5, rw: 250 },
+    { n: 'Altın', em: '🥇', c: '#ffd166', exp: 38, step: 6, rw: 500 },
+    { n: 'Elmas', em: '💎', c: '#7cf3ff', exp: 55, step: 8, rw: 1000 },
+    { n: 'Efsane', em: '👑', c: '#ff5cf0', exp: 80, step: 0, rw: 2000 }
+  ];
+  const RIVALS = ['Kuyruklu Kaan', 'Nebula Nil', 'Pulsar Efe', 'Kuasar Ece', 'Meteor Mert', 'Yıldız Defne', 'Galaksi Can', 'Orion Zeynep', 'Vega Arda', 'Andromeda Su', 'Komêt Kerem', 'Satürn Selin'];
+  let rk = store.get('rank', null);
+  const lgName = (t, d) => t >= 4 ? 'Efsane' : `${LG[t].n} ${['III', 'II', 'I'][d]}`;
+  const lgIdx = r => Math.min(12, r.t * 3 + r.d);
+  const lgExp = () => { const r = rkData(); return LG[r.t].exp + r.d * LG[r.t].step; };
+  function rkData() {
+    const s = seasonIdx();
+    if (!rk) { rk = { s, t: 0, d: 0, lp: 0, peak: 0, games: 0, hist: [] }; store.set('rank', rk); }
+    if (rk.s !== s) { // yeni sezon: geçen sezonun zirvesine göre ödül, bir lig aşağıdan başla
+      if (rk.games > 0) {
+        const pt = Math.min(4, Math.floor(rk.peak / 3)), rw = LG[pt].rw;
+        coins += rw; store.set('coins', coins);
+        setTimeout(() => toast(`⚔️ Sezon bitti! Zirven: ${LG[pt].em} ${LG[pt].n} · +${rw} ✦`), 1500);
+      }
+      rk = { s, t: Math.max(0, Math.min(3, rk.t) - 1), d: 0, lp: 0, peak: 0, games: 0, hist: [] };
+      rk.peak = lgIdx(rk); store.set('rank', rk);
+    }
+    return rk;
+  }
+  function applyLP(delta) {
+    const r = rkData(), before = lgIdx(r);
+    r.lp += delta; r.games++;
+    r.hist = [delta].concat(r.hist || []).slice(0, 8);
+    while (r.lp >= 100 && r.t < 4) { r.lp -= 100; if (r.d < 2) r.d++; else { r.t++; r.d = 0; } }
+    if (r.t >= 4) r.d = 0;
+    while (r.lp < 0) {
+      if (r.t === 0 && r.d === 0) { r.lp = 0; break; }
+      if (r.t >= 4) { r.t = 3; r.d = 2; } else if (r.d > 0) r.d--; else { r.t--; r.d = 2; }
+      r.lp += 100;
+    }
+    r.peak = Math.max(r.peak || 0, lgIdx(r));
+    store.set('rank', r);
+    if (r.t >= 2) unlock('rankGold');
+    if (r.t >= 4) unlock('rankLegend');
+    return lgIdx(r) - before; // >0 terfi, <0 düşüş
+  }
+  function startRanked() {
+    const exp = lgExp();
+    rival = { name: RIVALS[Math.floor(Math.random() * RIVALS.length)], target: Math.max(5, Math.round(exp * (0.75 + Math.random() * 0.5))), beat: false };
+    mode = 'ranked'; fixedSeed = null; runSeed = (Math.random() * 2147483647) | 0; setRng(runSeed);
+    beginPlay();
+    const r = rkData();
+    banner(`⚔️ ${LG[r.t].em} ${lgName(r.t, r.d).toUpperCase()}<small>Rakip: ${rival.name} · ${rival.target} puan</small>`, LG[r.t].c, 2);
+  }
+  function renderLeague() {
+    const r = rkData(), L = LG[r.t];
+    $('lgEm').textContent = L.em;
+    $('lgName').textContent = lgName(r.t, r.d); $('lgName').style.color = L.c;
+    $('lgFill').style.width = (r.t >= 4 ? 100 : Math.max(0, Math.min(100, r.lp))) + '%';
+    $('lgTxt').innerHTML = r.t >= 4 ? `<b>${r.lp} LP</b> · zirvedesin! Puanını korumaya çalış.` : `<b>${r.lp} / 100 LP</b> · bu kümede ortalama hedef: ~${lgExp()} puan`;
+    $('lgHist').innerHTML = (r.hist || []).map(h => `<span class="${h < 0 ? 'neg' : ''}">${h > 0 ? '+' : ''}${h}</span>`).join('');
+    $('lgLadder').innerHTML = LG.map((x, i) => `<div class="${i === r.t ? 'on' : (i < r.t ? 'done' : '')}"><b>${x.em}</b>${x.n}<span>${x.rw} ✦</span></div>`).join('');
+    $('lgSeason').textContent = `Sezon bitimine ${seasonLeft()} gün · sezon sonunda ulaştığın en yüksek ligin ödülü verilir`;
   }
 
   // ================= HAFTALIK GÖREVLER =================
@@ -1633,7 +1756,7 @@
       $('hudRL').textContent = '2. Oyuncu'; $('hudRL').style.color = solidOf(players[1].skin);
     } else {
       $('hudLL').textContent = mode === 'turns' ? turns.names[turns.idx] : (mode === 'zen' ? 'Yıldız' : 'Skor'); $('hudLL').style.color = '';
-      $('hudRL').textContent = { daily: 'Bugün en iyi', turns: 'Lider', time: 'En iyi', zen: 'Mod', hard: 'Hardcore rekor', camp: 'En iyi', weekly: 'Hedef', puz: 'Kalan yıldız' }[mode] || 'Rekor'; $('hudRL').style.color = mode === 'hard' ? '#ff5c7a' : '';
+      $('hudRL').textContent = { daily: 'Bugün en iyi', turns: 'Lider', time: 'En iyi', zen: 'Mod', hard: 'Hardcore rekor', camp: 'En iyi', weekly: 'Hedef', puz: 'Kalan yıldız', ranked: rival ? '⚔️ ' + rival.name : 'Rakip' }[mode] || 'Rekor'; $('hudRL').style.color = mode === 'hard' ? '#ff5c7a' : '';
     }
     $('hudML').textContent = (mode === 'duo' && duoMatch) ? `Tur ${duoMatch.round}/${duoMatch.total} · ${duoMatch.wins[0]}-${duoMatch.wins[1]} · Sv` : mode === 'daily' ? 'Meydan okuma · Sv' : (mode === 'time' ? 'Kalan süre' : (mode === 'camp' ? `Bölüm ${campIdx + 1} · Hedef` : (mode === 'puz' ? `Bulmaca ${puzIdx + 1} · süre · hamle` : 'Seviye')));
     updHud();
@@ -1647,6 +1770,7 @@
     else if (mode === 'zen') $('hudR').textContent = '🧘';
     else if (mode === 'weekly') $('hudR').textContent = wkData().done ? '✓' : wkRule().target;
     else if (isRec()) $('hudR').textContent = store.get(mode + 'Best', 0);
+    else if (mode === 'ranked') $('hudR').textContent = rival ? (rival.beat ? '🏆' : rival.target) : '–';
     else if (mode === 'solo' && chTarget) $('hudR').textContent = chBeat ? '🏆' : '🎯' + chTarget;
     else if (mode === 'daily') $('hudR').textContent = daily.key === todayKey() ? daily.best : 0;
     else if (mode === 'turns') $('hudR').textContent = turns.results.length ? Math.max(...turns.results.map(r => r.score)) : '–';
@@ -2114,6 +2238,12 @@
     if (mode === 'iron' && P0().alive) {
       const m = ironMult();
       if (m > ironM) { ironM = m; banner(`x${m} ÇARPAN 🪙<small>Hayatta kaldıkça artar</small>`, '#ffd166', 0); chime(); buzz(30); }
+    }
+    // Dereceli: rakibi geçince kutla
+    if (mode === 'ranked' && rival && !rival.beat && P0().score > rival.target) {
+      rival.beat = true; banner(`⚔️ ${rival.name.toUpperCase()} GEÇİLDİ!<small>+8 LP bonus</small>`, '#5cff9d', 0);
+      chime(); setTimeout(chime, 200); buzzP([20, 30, 60]); unlock('rank1'); updHud();
+      const q = ppos(P0()); burst(q.x, q.y, '#5cff9d', 30, 220);
     }
     // Meydan okuma: arkadaşın skorunu geçince kutla
     if (chTarget && !chBeat && mode === 'solo' && P0().score > chTarget) {
@@ -2796,6 +2926,21 @@
           head: `GÜNÜN MEYDAN OKUMASI · ${todayStr()}`, big: String(daily.best), sub: 'Aynı parkurda geçebilir misin?', skins: [p.skin],
           text: `Yörünge · Günün Meydan Okuması (${todayStr()}): ${daily.best} puan yaptım! Aynı parkurda beni geçebilir misin? 🚀`
         };
+      } else if (mode === 'ranked') {
+        const exp = lgExp(), beat = !!(rival && rival.beat);
+        let delta = Math.round((p.score / exp - 0.9) * 40);
+        delta = Math.max(-15, Math.min(30, delta)) + (beat ? 8 : 0);
+        const moved = applyLP(delta), r = rkData(), L = LG[r.t];
+        title = `DERECELİ · ${L.em} ${lgName(r.t, r.d).toUpperCase()}`;
+        msg = `${delta >= 0 ? '+' : ''}${delta} LP` + (rival ? (beat ? `  ·  ⚔️ ${rival.name} geçildi!` : `  ·  ${rival.name}: ${rival.target}`) : '');
+        if (moved > 0) { note = `⬆️ TERFİ! Artık ${L.em} ${lgName(r.t, r.d)}`; chime(); setTimeout(chime, 200); setTimeout(chime, 400); buzzP([40, 40, 40, 40, 120]); }
+        else if (moved < 0) note = `⬇️ Küme düştün: ${lgName(r.t, r.d)} · hemen geri al!`;
+        else note = r.t >= 4 ? `👑 ${r.lp} LP` : `${r.lp} / 100 LP · terfiye ${100 - r.lp} LP`;
+        const rb = store.get('rankedBest', 0); if (p.score > rb) store.set('rankedBest', p.score);
+        lastShare = {
+          head: `DERECELİ · ${lgName(r.t, r.d).toUpperCase()}`, big: String(p.score), sub: `${L.em} ${lgName(r.t, r.d)} · ${r.lp} LP`, skins: [p.skin],
+          text: `Yörünge Dereceli'de ${L.em} ${lgName(r.t, r.d)} ligindeyim! Son maç: ${p.score} puan ⚔️`
+        };
       } else if (isRec()) {
         const key = mode + 'Best', prev = store.get(key, 0);
         title = REC_MODES[mode];
@@ -2836,7 +2981,7 @@
           text: `Yörünge'de ${p.score} puan yaptım! Geç beni 🚀`
         };
       }
-      if (p.score > best && mode !== 'time' && mode !== 'hard' && mode !== 'camp' && mode !== 'weekly' && mode !== 'puz' && !isRec()) best = p.score;
+      if (p.score > best && mode !== 'time' && mode !== 'hard' && mode !== 'camp' && mode !== 'weekly' && mode !== 'puz' && mode !== 'ranked' && !isRec()) best = p.score;
       checkMastery(mode, p.score);
       const brk = (mode !== 'camp' && mode !== 'weekly' && mode !== 'puz') ? addBoard(mode, p.score) : 0;
       petGain(p.stats.stars);
@@ -2858,8 +3003,9 @@
     if (showCode) {
       const p = P0(); // (bu blok yukarıdaki else'in dışında; p burada ayrıca tanımlanmalı)
       const chc = seedCode(runSeed) + (p.score > 0 ? '-' + p.score : '');
-      $('overCode').textContent = `🔑 Meydan okuma kodu: ${chc} · arkadaşın bu skoru geçmeye çalışsın`;
-      if (lastShare) lastShare.text += ` 🔑 Meydan okuma kodum: ${chc} (Menü → Meydan Okuma Kodu)`;
+      const gh = p.score > 0 ? encodeGhost(ghostRec) : ''; // koşu da koda eklenir: arkadaşın seni hayalet olarak görür
+      $('overCode').textContent = `🔑 Meydan okuma kodu: ${chc}${gh ? ' (+ hayalet, paylaşımın içinde)' : ''} · arkadaşın bu skoru geçmeye çalışsın`;
+      if (lastShare) lastShare.text += ` 🔑 Meydan okuma kodum: ${chc}${gh ? '-' + gh : ''} (Menü → Meydan Okuma Kodu)`;
       if (chTarget) {
         msg = p.score > chTarget ? `🏆 Arkadaşını geçtin! (${p.score} > ${chTarget})` : `🎯 Arkadaşının skoru ${chTarget} · ${chTarget - p.score + 1} puan eksik kaldın`;
         $('overMsg').textContent = msg;
@@ -3401,21 +3547,24 @@
       }
 
       // hayalet rekor (tek kişilik)
-      if (settings.ghostRun && mode === 'solo' && state === 'play' && ghostRun && ghostRun.length > 1) {
+      // arkadaşın hayaleti (meydan okuma kodundan) varsa her zaman onu göster
+      const GR = friendGhost || ghostRun;
+      if ((friendGhost || settings.ghostRun) && mode === 'solo' && state === 'play' && GR && GR.length > 1) {
         const fi = gt / 0.1, i0 = Math.floor(fi);
-        if (i0 < ghostRun.length - 1) {
-          const g0 = ghostRun[i0], g1 = ghostRun[i0 + 1], f = fi - i0;
+        if (i0 < GR.length - 1) {
+          const g0 = GR[i0], g1 = GR[i0 + 1], f = fi - i0;
           const ga = g0[0] + (g1[0] - g0[0]) * f;
           const gr0 = rings[Math.min(g0[1], NR - 1)], gr1 = rings[Math.min(g1[1], NR - 1)];
           const gq = pos(ga, gr0 + (gr1 - gr0) * f);
           ctx.globalAlpha = 0.28; ctx.fillStyle = '#dfe3ff'; ctx.shadowColor = '#dfe3ff'; ctx.shadowBlur = 12;
           ctx.beginPath(); ctx.arc(gq.x, gq.y, U * 0.016, 0, 6.283); ctx.fill(); ctx.shadowBlur = 0;
           ctx.globalAlpha = 0.45; ctx.font = `700 ${Math.max(10, U * 0.016)}px Space Grotesk, system-ui`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-          ctx.fillText('👻 REKOR', gq.x, gq.y - U * 0.035);
+          ctx.fillText(friendGhost ? '👤 ARKADAŞ' : '👻 REKOR', gq.x, gq.y - U * 0.035);
           ctx.globalAlpha = 1;
         } else if (!ghostPassed && P0().alive) {
           ghostPassed = true;
-          const q = ppos(P0()); floatText(q.x, q.y - 20, '👻 Rekor koşusunu geçtin!', '#dfe3ff');
+          const q = ppos(P0()); floatText(q.x, q.y - 20, friendGhost ? '👤 Arkadaşından uzun dayandın!' : '👻 Rekor koşusunu geçtin!', '#dfe3ff');
+          if (friendGhost) unlock('ghostBeat');
         }
       }
 
@@ -3562,6 +3711,7 @@
     const wav = wheelAvail(), sc = seasonClaimable();
     $('menuDot').style.display = (av || wav || sc) ? 'block' : 'none';
     $('seasonBadge').style.display = sc ? 'flex' : 'none'; $('seasonBadge').textContent = sc;
+    { const r = rkData(); $('rankEm').textContent = LG[r.t].em; $('rankSub').textContent = `${lgName(r.t, r.d)} · ${r.lp} LP · herkes eşit`; }
     $('puzInfo').textContent = `⭐ ${puzStars()} / ${PUZ.length * 3} · ${PUZ.length} bulmaca`;
     $('petInfo').textContent = `${pet.name} · ${PET_ST[petStage()].n}`;
     $('seasonInfo').textContent = `Kademe ${seasonTier()}/${SEASON_TIERS}` + (sc ? ` · ${sc} ödül hazır!` : ` · ${seasonLeft()} gün kaldı`);
@@ -3965,7 +4115,7 @@
   }
 
   let panelOpen = 'menu', backTo = 'menu';
-  const PANELS = ['menu', 'over', 'pause', 'shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'wheelP', 'codeP', 'seasonP', 'puzP', 'petP', 'replayP', 'modesP', 'turnNext', 'turnsResult', 'cardModal', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'];
+  const PANELS = ['menu', 'over', 'pause', 'shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'wheelP', 'codeP', 'seasonP', 'puzP', 'petP', 'replayP', 'modesP', 'leagueP', 'turnNext', 'turnsResult', 'cardModal', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'];
   function show(id) {
     PANELS.forEach(p => $(p).classList.toggle('hidden', p !== id)); panelOpen = id;
     if (id === 'modesP') backTo = 'menu'; // 2 Kişi/Sırayla kurulumundan dönünce Geri yine ana sayfaya gider
@@ -3986,6 +4136,7 @@
     if (id === 'wheelP') { $('wheelPrize').textContent = ''; renderWheel(); }
     if (id === 'seasonP') renderSeason();
     if (id === 'puzP') renderPuz();
+    if (id === 'leagueP') renderLeague();
     if (id === 'petP') renderPet();
     if (id === 'replayP') playReplay();
   }
@@ -4032,6 +4183,7 @@
     if (mode === 'turns') return;
     if (mode === 'camp') { startCamp(campIdx); return; }
     if (mode === 'puz') { startPuz(puzIdx); return; }
+    if (mode === 'ranked') { startRanked(); return; }
     if (mode === 'duo') { if (!duoMatch || duoMatch.done) duoMatch = newDuo(duoMatch ? duoMatch.total : duoRounds); else duoMatch.round++; }
     startMode(mode);
   }
@@ -4050,14 +4202,14 @@
     if ($('menu').classList.contains('drawer-open')) { $('menu').classList.remove('drawer-open'); return 'ok'; }
     if (state === 'play' || state === 'pause') { if (state === 'play' || resumeCD <= 0) pause(); return 'ok'; }
     if (panelOpen === 'cardModal') { show(cardBack); return 'ok'; }
-    if (['shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'wheelP', 'codeP', 'seasonP', 'puzP', 'petP', 'replayP', 'modesP', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'].includes(panelOpen)) { if (panelOpen === 'wheelP' && wheelBusy) return 'ok'; show(backTo); refreshMeta(); return 'ok'; }
+    if (['shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'wheelP', 'codeP', 'seasonP', 'puzP', 'petP', 'replayP', 'modesP', 'leagueP', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'].includes(panelOpen)) { if (panelOpen === 'wheelP' && wheelBusy) return 'ok'; show(backTo); refreshMeta(); return 'ok'; }
     if (state === 'over' || panelOpen === 'over' || panelOpen === 'turnNext' || panelOpen === 'turnsResult') { toMenu(); return 'ok'; }
     if (Date.now() - backExitT < 2000) return 'exit';
     backExitT = Date.now(); toast('Çıkmak için tekrar geri bas'); return 'ok';
   };
   function toMenu() {
     $('hint').classList.remove('show'); $('novaBar').style.display = 'none'; tut = false;
-    state = 'menu'; mode = 'solo'; turns = null; duoMatch = null; fixedSeed = null; chTarget = 0; setRng(null); reset(); show('menu'); refreshMeta();
+    state = 'menu'; mode = 'solo'; turns = null; duoMatch = null; fixedSeed = null; chTarget = 0; friendGhost = null; rival = null; setRng(null); reset(); show('menu'); refreshMeta();
     $('revBtn').style.display = 'none'; showZones(false); $('powers').innerHTML = ''; lastPowHtml = '';
   }
 
@@ -4069,6 +4221,8 @@
   const renderRoundSeg = () => document.querySelectorAll('#roundSeg button').forEach(b => b.classList.toggle('on', +b.dataset.n === duoRounds));
   on('duoBtn', () => { renderRoundSeg(); openSub('duoSetup', 'modesP'); });
   on('modesBtn', () => openSub('modesP', 'menu'));
+  on('rankBtn', () => openSub('leagueP', 'menu'));
+  on('lgPlay', startRanked);
   document.querySelectorAll('#roundSeg button').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); duoRounds = +b.dataset.n; store.set('duoRounds', duoRounds); renderRoundSeg(); }));
   on('duoGo', () => { duoMatch = newDuo(duoRounds); startMode('duo'); });
   on('timeBtn', () => startMode('time'));
@@ -4111,8 +4265,8 @@
     const ch = parseChal($('codeIn').value);
     if (!ch) { $('codeErr').textContent = '⚠️ Kod geçersiz. Örnek: YRG-1A2B3C-45'; beep(120, .15, 'square', .04); return; }
     $('codeIn').blur();
-    fixedSeed = ch.seed; chTarget = ch.target; startMode('solo');
-    banner(chTarget ? `🎯 HEDEF: ${chTarget}<small>Arkadaşının skorunu geç!</small>` : `🔑 ${seedCode(ch.seed)}<small>Arkadaşının parkuru</small>`, '#7cf3ff', 2);
+    fixedSeed = ch.seed; chTarget = ch.target; friendGhost = ch.ghost; startMode('solo');
+    banner(chTarget ? `🎯 HEDEF: ${chTarget}<small>Arkadaşının skorunu geç!${friendGhost ? ' · 👤 hayaleti seninle' : ''}</small>` : `🔑 ${seedCode(ch.seed)}<small>Arkadaşının parkuru</small>`, '#7cf3ff', 2);
   }
   on('codeGo', playCode);
   on('statsBtn', () => openSub('statsP', 'menu'));
@@ -4202,7 +4356,7 @@
     if (k === 'Escape' && $('menu').classList.contains('drawer-open')) { $('menu').classList.remove('drawer-open'); return; }
     if (k === 'Escape') {
       if (state === 'play' || state === 'pause') pause();
-      else if (['shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'wheelP', 'codeP', 'seasonP', 'puzP', 'petP', 'replayP', 'modesP', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'].includes(panelOpen)) show(backTo);
+      else if (['shop', 'missions', 'help', 'turnsSetup', 'duoSetup', 'wheelP', 'codeP', 'seasonP', 'puzP', 'petP', 'replayP', 'modesP', 'leagueP', 'settings', 'dailyRw', 'achs', 'statsP', 'campMap', 'boardP'].includes(panelOpen)) show(backTo);
       else if (panelOpen === 'cardModal') show(cardBack);
       return;
     }
