@@ -101,6 +101,12 @@
   .bigtxt .dItem small{font-size:14px}
   .bigtxt #hud{transform:scale(1.15);transform-origin:top center}
   .mode .em{font-size:24px}
+  /* oyun sonu: küçük simge butonlar */
+  .irow{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:94vw}
+  .ibtn{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:60px;padding:8px 6px;border-radius:14px;border:1px solid #2e3360;background:rgba(20,22,45,.75);color:#e8ecff;font:inherit;font-size:20px;line-height:1;cursor:pointer}
+  .ibtn span:not(.badge){font-size:10px;opacity:.7;letter-spacing:.02em}
+  .ibtn:active{transform:scale(.95)}
+  .ibtn.on{border-color:#7cf3ff}
   .mgroup{grid-column:1/-1;text-align:left;font-size:12px;font-weight:700;letter-spacing:.2em;opacity:.6;margin:8px 0 -2px 4px}
   .mgroup:first-child{margin-top:0}
   .modesBig{position:relative;display:flex;align-items:center;justify-content:center;gap:14px;width:min(420px,86vw);padding:16px 20px;border-radius:18px;border:1px solid rgba(124,243,255,.5);background:linear-gradient(90deg,rgba(124,243,255,.14),rgba(185,139,255,.14));color:#e8ecff;font:inherit;cursor:pointer;text-align:left;transition:transform .15s}
@@ -577,19 +583,22 @@
   <p id="overMsg"></p>
   <div class="coins" id="earned"></div>
   <div class="note" id="overNote"></div>
-  <div class="small" id="overCode" style="display:none;opacity:.75"></div>
-  <div class="stats" id="stats"></div>
+  <div id="overDetail" style="display:none;flex-direction:column;align-items:center;gap:10px">
+    <div class="stats" id="stats"></div>
+    <div class="small" id="overCode" style="display:none;opacity:.75"></div>
+  </div>
   <div class="row">
     <button class="main" id="nextBtn" style="display:none;background:#ffd166">SONRAKİ ▶</button>
     <button class="main" id="againBtn">TEKRAR</button>
-    <button class="gold" id="shareBtn">📤 Skor kartı</button>
   </div>
-  <div class="row">
-    <button class="ghost" id="replayBtn">🎬 Son anlar</button>
-    <button class="ghost" id="overShop">🛒 Mağaza</button>
-    <button class="ghost" id="overMiss">🎯 Görevler<span class="badge" id="missBadge2" style="display:none">0</span></button>
-    <button class="ghost" id="mapBtn2" style="display:none">🗺️ Harita</button>
-    <button class="ghost" id="menuBtn">Ana menü</button>
+  <div class="irow">
+    <button class="ibtn" id="shareBtn">📤<span>Paylaş</span></button>
+    <button class="ibtn" id="detailBtn">📊<span>Detay</span></button>
+    <button class="ibtn" id="replayBtn">🎬<span>Son anlar</span></button>
+    <button class="ibtn" id="overShop">🛒<span>Mağaza</span></button>
+    <button class="ibtn" id="overMiss">🎯<span>Görevler</span><span class="badge" id="missBadge2" style="display:none">0</span></button>
+    <button class="ibtn" id="mapBtn2" style="display:none">🗺️<span>Harita</span></button>
+    <button class="ibtn" id="menuBtn">🏠<span>Menü</span></button>
   </div>
 </div>
 
@@ -2865,7 +2874,8 @@
     $('overShop').style.display = mode === 'camp' ? 'none' : '';
     $('finalScore').innerHTML = scoreTxt;
     $('overMsg').textContent = msg;
-    $('earned').textContent = `+${earned + coinBonus} ✦${coinBonus ? ` (💰+${coinBonus})` : ''}  ·  +${earned + bossKills * 20} XP  ·  Toplam ✦ ${coins}`;
+    $('earned').textContent = `+${earned + coinBonus} ✦  ·  +${earned + bossKills * 20} XP`;
+    $('overDetail').style.display = 'none'; $('detailBtn').classList.remove('on');
     $('overNote').textContent = note;
     $('stats').innerHTML = statsHtml;
     refreshMeta(); updHud();
@@ -4073,6 +4083,7 @@
   on('seasonBtn', () => openSub('seasonP', 'menu'));
   on('seasonAll', claimAllSeason);
   on('puzBtn', () => openSub('puzP', 'menu'));
+  on('detailBtn', () => { const open = $('overDetail').style.display === 'none'; $('overDetail').style.display = open ? 'flex' : 'none'; $('detailBtn').classList.toggle('on', open); });
   on('petBtn', () => openSub('petP', 'menu'));
   on('replayBtn', () => { if (rpCount >= 5) openSub('replayP', 'over'); });
   on('rpSlow', () => { rpSlow = !rpSlow; $('rpSlow').textContent = rpSlow ? '▶️ Normal hız' : '🐢 Yavaş çekim'; playReplay(); });
